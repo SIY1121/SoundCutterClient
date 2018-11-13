@@ -1,0 +1,26 @@
+{
+  "name": "SoundCutterClient",
+  "version": "1.0.0",
+  "description": "My beautiful Nuxt.js project",
+  "author": "SIY1121",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.0.0",
+    "@nuxtjs/bulma": "^1.2.0",
+    "cross-env": "^5.2.0",
+    "node-sass": "^4.10.0",
+    "nuxt": "^2.0.0",
+    "sass-loader": "^7.1.0",
+    "vuedraggable": "^2.16.0",
+    "web-audio-beat-detector": "^7.0.6"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
