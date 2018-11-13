@@ -2,11 +2,7 @@
   <section class="container">
     <div>
       <logo/>
-      <div>
-        <draggable v-model="originalBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false"  class="flex">
-          <sound-block v-for="(block,index) in originalBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id"/>
-        </draggable>  
-      </div>
+      <origianl-sound-selector @select="append"/>
       <div>
         <draggable v-model="soundBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false"  class="flex">
           <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id"/>
@@ -19,6 +15,7 @@
 
 <script>
 import Logo from "~/components/Logo.vue";
+import OrigianlSoundSelector from "~/components/OriginalSoundSelector.vue";
 import SoundBlock from "~/components/SoundBlock.vue";
 import draggable from "vuedraggable";
 import { analyze } from "web-audio-beat-detector";
@@ -27,17 +24,19 @@ export default {
   components: {
     Logo,
     SoundBlock,
+    OrigianlSoundSelector,
     draggable
   },
   data: function() {
     return {
-      originalBlocks: [],
       soundBlocks: []
     };
   },
   mounted: function() {
+    this.$store.commit("setDevice", this.detectDevice());
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     this.$store.commit("initContext", new AudioContext());
+
     fetch("/sanjo.mp3")
       .then(res => {
         return res.arrayBuffer();
@@ -50,29 +49,30 @@ export default {
         return analyze(buf);
       })
       .then(bpm => {
-        this.$store.commit("setBpm", Math.round(bpm));
         this.$store.commit("setStartOffset", 1.358);
-        const bl = 60.0 / this.$store.state.bpm;
-        const buf = this.$store.state.buffer;
-        let time = 0.0;
-        let counter = 0;
-        const beatLength = this.$store.getters.beatLength;
-        this.originalBlocks.push({
-          startPos: 0,
-          endPos: this.$store.state.startOffset,
-          id: counter
-        });
-        time += this.$store.state.startOffset;
-        counter++;
-        while (time < buf.duration) {
-          this.originalBlocks.push({
-            startPos: time,
-            endPos: time + beatLength,
-            id: counter
-          });
-          counter++;
-          time += beatLength;
-        }
+        //this.$store.commit("setStartOffset", 0.770);
+        this.$store.commit("setBpm", Math.round(bpm));
+        // const bl = 60.0 / this.$store.state.bpm;
+        // const buf = this.$store.state.buffer;
+        // let time = 0.0;
+        // let counter = 0;
+        // const beatLength = this.$store.getters.beatLength;
+        // this.originalBlocks.push({
+        //   startPos: 0,
+        //   endPos: this.$store.state.startOffset,
+        //   id: counter
+        // });
+        // time += this.$store.state.startOffset;
+        // counter++;
+        // while (time < buf.duration) {
+        //   this.originalBlocks.push({
+        //     startPos: time,
+        //     endPos: time + beatLength,
+        //     id: counter
+        //   });
+        //   counter++;
+        //   time += beatLength;
+        // }
       });
   },
   methods: {
@@ -83,6 +83,23 @@ export default {
         id: this.$store.state.blockSpesificId
       });
       this.$store.commit("genBlock");
+    },
+    append: function(data){
+      this.genSoundBlock(data.startPos,data.endPos);
+    },
+    detectDevice: function() {
+      const ua = navigator.userAgent;
+      if (
+        ua.indexOf("iPhone") > 0 ||
+        ua.indexOf("iPod") > 0 ||
+        (ua.indexOf("Android") > 0 && ua.indexOf("Mobile") > 0)
+      ) {
+        return "sp";
+      } else if (ua.indexOf("iPad") > 0 || ua.indexOf("Android") > 0) {
+        return "tab";
+      } else {
+        return "other";
+      }
     }
   }
 };

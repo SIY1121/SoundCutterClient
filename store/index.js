@@ -11,7 +11,8 @@ const createStore = () => {
       blockSpesificId: 0,// 一意のidを生成するためのもの
       bpm: 0,
       startOffset: 0.0,
-      pixelPerSec: 50
+      pixelPerSec: 50,
+      device: ""
     }),
     mutations: {
       initContext(state, ctx) {
@@ -21,20 +22,23 @@ const createStore = () => {
         state.buffer = buffer;
         state.rawBuffer = buffer.getChannelData(0);
       },
-      setBpm(state,bpm){
+      setBpm(state, bpm) {
         state.bpm = bpm;
       },
-      setStartOffset(state, offset){
+      setStartOffset(state, offset) {
         state.startOffset = offset;
       },
-      setPlayBlock(state, index){
+      setPlayBlock(state, index) {
         state.playingBlock = index;
       },
-      genBlock(state){
+      genBlock(state) {
         state.blockSpesificId++;
-      }
+      },
+      setDevice(state, d) {
+        state.device = d;
+      },
     },
-    getters :{
+    getters: {
       beatLength: state => {
         return 60.0 / state.bpm;
       }
