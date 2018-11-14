@@ -2,13 +2,10 @@
   <section class="container">
     <div>
       <file-selector/>
-      <origianl-sound-selector @select="append"/>
       <div>
-        <draggable v-model="soundBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false"  class="flex">
-          <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id"/>
-        </draggable>  
+        <origianl-sound-selector v-for="(file,index) in files" :file="file" v-bind:key="file.id" @select="selected"/>
       </div>
-      
+      <edit-area/>      
     </div>
   </section>
 </template>
@@ -18,7 +15,7 @@ import Logo from "~/components/Logo.vue";
 import OrigianlSoundSelector from "~/components/OriginalSoundSelector.vue";
 import SoundBlock from "~/components/SoundBlock.vue";
 import FileSelector from "~/components/FileSelector.vue";
-import draggable from "vuedraggable";
+import EditArea from "~/components/EditArea.vue";
 import { analyze } from "web-audio-beat-detector";
 import test from "~/assets/bpmAnalyzer.js";
 
@@ -28,12 +25,10 @@ export default {
     SoundBlock,
     FileSelector,
     OrigianlSoundSelector,
-    draggable
+    EditArea
   },
   data: function() {
-    return {
-      soundBlocks: []
-    };
+    return {};
   },
   mounted: function() {
     this.$store.commit("setDevice", this.detectDevice());
@@ -49,20 +44,14 @@ export default {
       .then(buf => {
         this.$store.commit("setMBuffer", buf);
       });
-
-    
   },
   methods: {
-    genSoundBlock: function(s, e) {
-      this.soundBlocks.push({
-        startPos: s,
-        endPos: e,
-        id: this.$store.state.blockSpesificId
+    selected: function(data){
+      this.$store.commit("addBlock",{
+        startPos: data.startPos,
+        endPos: data.endPos,
+        fileId: data.fileId
       });
-      this.$store.commit("genBlock");
-    },
-    append: function(data) {
-      this.genSoundBlock(data.startPos, data.endPos);
     },
     detectDevice: function() {
       const ua = navigator.userAgent;
@@ -80,15 +69,8 @@ export default {
     }
   },
   computed: {
-    buffer: function() {
-      return this.$store.state.buffer;
-    }
-  },
-  watch: {
-    buffer: async function(n, o) {
-      const res = await test(n);
-      this.$store.commit("setStartOffset", res.offset);
-      this.$store.commit("setBpm", Math.round(res.bpm));
+    files: function() {
+      return this.$store.state.files;
     }
   }
 };

@@ -1,26 +1,28 @@
 <template>
     <div>
         <div class="flex">
-            <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
+            <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>
         <button @click="playPause">play</button>
         <button @click="audioElm.currentTime = 0;playingBlockIndex = 0">s</button>
         <button @click="selectStart">[</button>
         <button @click="selectEnd">]</button>
-        <button @click="$emit('select',{startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">↓</button>
-        <audio id="originalTrack" src="/od.webm"/>
-        <input type="number" step="0.001" :value="startOffset" @input="updateStartOffset">
+        <button @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">↓</button>
+        <audio :id="audioElmId" :src="file.dataURL"/>
+        <input type="number" step="0.001" :value="file.startOffset" @input="updateStartOffset">
     </div>
 </template>
 
 <script>
 import OriginalSoundBlock from "~/components/OriginalSoundBlock.vue";
+import analyze from "~/assets/bpmAnalyzer.js";
 
 export default {
   components: {
     OriginalSoundBlock
   },
   name: "OriginalSoundSelector",
+  props: ["file"],
   data: function() {
     return {
       blocks: [],
@@ -36,19 +38,46 @@ export default {
     };
   },
   methods: {
+    prepareData: function() {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        const reader2 = new FileReader();
+        const vue = this;
+        reader.onload = async f => {
+          const buf = await vue.$store.state.context.decodeAudioData(
+            f.target.result
+          );
+          vue.file.buffer = buf;
+          vue.file.rawBuffer = buf.getChannelData(0);
+          const res = await analyze(buf);
+          vue.file.bpm = res.bpm;
+          vue.file.beatLength = 60 / res.bpm;
+          vue.file.startOffset = res.offset;
+
+          reader2.onload = d => {
+            vue.file.dataURL = d.target.result;
+          };
+
+          reader2.readAsDataURL(vue.file.file);
+
+          resolve();
+        };
+        reader.readAsArrayBuffer(this.file.file);
+      });
+    },
     init: function() {
       this.blocks.splice(0, this.blocks.length);
-      const buf = this.$store.state.buffer;
+      const buf = this.file.buffer;
       let time = 0.0;
-      const beatLength = this.$store.getters.beatLength;
+      const beatLength = this.file.beatLength;
       this.blocks.push({
         startPos: 0,
-        endPos: this.$store.state.startOffset,
+        endPos: this.file.startOffset,
         id: this.counter,
         playing: false,
         selecting: false
       });
-      time += this.$store.state.startOffset;
+      time += this.file.startOffset;
       this.counter++;
       while (time < buf.duration) {
         this.blocks.push({
@@ -61,11 +90,13 @@ export default {
         this.counter++;
         time += beatLength;
       }
-      this.audioElm = window.document.querySelector("#originalTrack");
+      this.audioElm = window.document.getElementById(this.audioElmId);
       this.audioElm.onended = () => {
         this.playing = false;
         this.playingBlockIndex = 0;
       };
+
+      clearInterval(this.intervalId);
       this.intervalId = setInterval(() => {
         this.position = this.audioElm.currentTime;
         for (let i = this.playingBlockIndex; i < this.blocks.length; i++) {
@@ -74,8 +105,7 @@ export default {
             this.position < this.blocks[i].endPos
           ) {
             this.playingBlockIndex = i;
-            if(!this.blocks[i].playing)
-              this.metro();
+            if (!this.blocks[i].playing) this.metro();
             this.blocks[i].playing = true;
             break;
           } else {
@@ -83,6 +113,8 @@ export default {
           }
         }
       }, 20);
+
+      this.file.prepared = true;
     },
     playPause: function() {
       if (this.playing) {
@@ -120,25 +152,20 @@ export default {
       this.mSource.connect(this.$store.state.context.destination);
       this.mSource.start(0);
     },
-    updateStartOffset: function(e) {
-      this.$store.commit("setStartOffset", Number(e.target.value));
+    updateStartOffset:function(e){
+      this.file.startOffset = Number(e.target.value);
+      this.init();
     }
   },
   computed: {
-    bpm: function() {
-      return this.$store.state.bpm;
+    audioElmId: function() {
+      return "OriginalTrack" + this.file.id;
     },
-    startOffset: function() {
-      return this.$store.state.startOffset;
-    }
+    
   },
-  watch: {
-    bpm: function(o, n) {
-      this.init();
-    },
-    startOffset: function() {
-      this.init();
-    }
+  mounted: async function() {
+    await this.prepareData();
+    this.init();
   }
 };
 </script>

@@ -10,18 +10,21 @@ export default {
   methods: {
     onFileSelect: function(e) {
       const f = e.target.files[0];
-      const reader = new FileReader();
-      const reader2 = new FileReader();
-      reader.onload = async file => {
-        const buf = await this.$store.state.context.decodeAudioData(
-          file.target.result
-        );
-        this.$store.commit("setBuffer", buf);
+
+      const file = {
+        id: Date.now(),
+        file: f,
+        name: f.name,
+        buffer: null,
+        rawBuffer: null,
+        dataURL: null,
+        bpm: 0,
+        beatLength: 0,
+        startOffset: 0,
+        prepared: false
       };
-      reader.readAsArrayBuffer(f);
-      reader2.onload = file =>{
-          
-      }
+
+      this.$store.commit("addFile", file);
     }
   }
 };

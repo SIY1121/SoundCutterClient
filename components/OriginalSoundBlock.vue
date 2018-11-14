@@ -9,7 +9,7 @@
 <script>
 export default {
   name: "OriginalSoundBlock",
-  props: ["startPos", "endPos", "index", "id", "playing","selecting"],
+  props: ["startPos", "endPos", "index", "id", "playing", "selecting", "file"],
   data: function() {
     return {};
   },
@@ -19,7 +19,7 @@ export default {
         .getElementById(this.canvasId)
         .getContext("2d");
       ctx.fillStyle = "red";
-      const sr = this.$store.state.buffer.sampleRate;
+      const sr = this.file.buffer.sampleRate;
       const pixelPerSec = this.$store.state.pixelPerSec;
       const startSamplePos = Math.round(sr * this.startPos);
       const endSamplePos = Math.round(sr * this.endPos);
@@ -27,7 +27,7 @@ export default {
       const oneBarSampleCount = Math.round(
         needSampleCount / (pixelPerSec * (this.endPos - this.startPos))
       );
-      const rawSample = this.$store.state.rawBuffer;
+      const rawSample = this.file.rawBuffer;
       let counter = 0;
       for (let i = startSamplePos; i < endSamplePos; i += oneBarSampleCount) {
         let avg = 0;
@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     canvasId: function() {
-      return "original-sound-block-canvas-" + this.id;
+      return "original-sound-block-canvas-" + this.id + this.file.id;
     },
     canvasWidth: function() {
       return (this.endPos - this.startPos) * this.$store.state.pixelPerSec;
@@ -63,6 +63,6 @@ div:hover {
   background-color: yellow;
 }
 .selecting {
-    background-color: blue;
+  background-color: blue;
 }
 </style>

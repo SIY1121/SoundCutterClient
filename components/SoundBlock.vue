@@ -9,7 +9,7 @@
 <script>
 export default {
   name: "SoundBlock",
-  props: ["startPos", "endPos", "index", "id"],
+  props: ["startPos", "endPos", "index", "id","file"],
   data: function() {
     return {
       playing: false
@@ -18,7 +18,7 @@ export default {
   methods: {
     play: function() {
       const source = this.$store.state.context.createBufferSource();
-      source.buffer = this.$store.state.buffer;
+      source.buffer = this.file.buffer;
       source.onended = () => {
         this.playing = false;
         this.$store.commit("setPlayBlock", this.index + 1);
@@ -32,7 +32,7 @@ export default {
         .getElementById(this.canvasId)
         .getContext("2d");
       ctx.fillStyle = "red";
-      const sr = this.$store.state.buffer.sampleRate;
+      const sr = this.file.buffer.sampleRate;
       const pixelPerSec = this.$store.state.pixelPerSec;
       const startSamplePos = Math.round(sr * this.startPos);
       const endSamplePos = Math.round(sr * this.endPos);
@@ -40,7 +40,7 @@ export default {
       const oneBarSampleCount = Math.round(
         needSampleCount / (pixelPerSec * (this.endPos - this.startPos))
       );
-      const rawSample = this.$store.state.rawBuffer;
+      const rawSample = this.file.rawBuffer;
       let counter = 0;
       for (let i = startSamplePos; i < endSamplePos; i += oneBarSampleCount) {
         let avg = 0;

@@ -5,13 +5,11 @@ const createStore = () => {
   return new Vuex.Store({
     state: () => ({
       context: null,
-      buffer: null,
-      rawBuffer: null,
+      files: [],
+      soundBlocks: [],
       mBuffer: null,
-      playingBlock: 0,// 再生中のブロックのインデックス
-      blockSpesificId: 0,// 一意のidを生成するためのもの
-      bpm: 0,
-      startOffset: 0.0,
+      playingBlock: 0,
+      blockSpesificId: 0,
       pixelPerSec: 50,
       device: ""
     }),
@@ -23,20 +21,20 @@ const createStore = () => {
         state.buffer = buffer;
         state.rawBuffer = buffer.getChannelData(0);
       },
-      setMBuffer(state, buffer){
+      addFile(state, file) {
+        state.files.push(file);
+      },
+      setMBuffer(state, buffer) {
         state.mBuffer = buffer;
-      },
-      setBpm(state, bpm) {
-        state.bpm = bpm;
-      },
-      setStartOffset(state, offset) {
-        state.startOffset = offset;
       },
       setPlayBlock(state, index) {
         state.playingBlock = index;
       },
-      genBlock(state) {
+      addBlock(state, block) {
         state.blockSpesificId++;
+        block.id = state.blockSpesificId;
+        block.file = state.files.find(el => el.id === block.fileId);
+        state.soundBlocks.push(block);
       },
       setDevice(state, d) {
         state.device = d;
