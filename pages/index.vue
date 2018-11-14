@@ -19,6 +19,7 @@ import OrigianlSoundSelector from "~/components/OriginalSoundSelector.vue";
 import SoundBlock from "~/components/SoundBlock.vue";
 import draggable from "vuedraggable";
 import { analyze } from "web-audio-beat-detector";
+import test from "~/assets/bpmAnalyzer.js";
 
 export default {
   components: {
@@ -47,7 +48,7 @@ export default {
         this.$store.commit("setMBuffer", buf);
       });
 
-    fetch("/h.mp3")
+    fetch("/bd.mp3")
       .then(res => {
         return res.arrayBuffer();
       })
@@ -56,21 +57,13 @@ export default {
       })
       .then(buf => {
         this.$store.commit("setBuffer", buf);
-        return analyze(buf);
+        return test(buf);
       })
-      .then(bpm => {
-        for (let i = 0; i < this.$store.state.rawBuffer.length; i++) {
-          if (Math.abs(this.$store.state.rawBuffer[i]) > 0.05) {
-            this.$store.commit(
-              "setStartOffset",
-              i / this.$store.state.buffer.sampleRate - 0.024
-            );
-            break;
-          }
-        }
+      .then(res => {
+        this.$store.commit("setStartOffset", res.offset);
         //this.$store.commit("setStartOffset", 1.358);
         //this.$store.commit("setStartOffset", 0.770);
-        this.$store.commit("setBpm", Math.round(bpm));
+        this.$store.commit("setBpm", Math.round(res.bpm));
         // const bl = 60.0 / this.$store.state.bpm;
         // const buf = this.$store.state.buffer;
         // let time = 0.0;
