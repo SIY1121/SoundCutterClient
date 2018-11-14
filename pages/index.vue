@@ -1,7 +1,7 @@
 <template>
   <section class="container">
     <div>
-      <logo/>
+      <file-selector/>
       <origianl-sound-selector @select="append"/>
       <div>
         <draggable v-model="soundBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false"  class="flex">
@@ -17,6 +17,7 @@
 import Logo from "~/components/Logo.vue";
 import OrigianlSoundSelector from "~/components/OriginalSoundSelector.vue";
 import SoundBlock from "~/components/SoundBlock.vue";
+import FileSelector from "~/components/FileSelector.vue";
 import draggable from "vuedraggable";
 import { analyze } from "web-audio-beat-detector";
 import test from "~/assets/bpmAnalyzer.js";
@@ -25,6 +26,7 @@ export default {
   components: {
     Logo,
     SoundBlock,
+    FileSelector,
     OrigianlSoundSelector,
     draggable
   },
@@ -48,44 +50,7 @@ export default {
         this.$store.commit("setMBuffer", buf);
       });
 
-    fetch("/od.webm")
-      .then(res => {
-        return res.arrayBuffer();
-      })
-      .then(buf => {
-        return this.$store.state.context.decodeAudioData(buf);
-      })
-      .then(buf => {
-        this.$store.commit("setBuffer", buf);
-        return test(buf);
-      })
-      .then(res => {
-        this.$store.commit("setStartOffset", res.offset);
-        //this.$store.commit("setStartOffset", 1.358);
-        //this.$store.commit("setStartOffset", 0.770);
-        this.$store.commit("setBpm", Math.round(res.bpm));
-        // const bl = 60.0 / this.$store.state.bpm;
-        // const buf = this.$store.state.buffer;
-        // let time = 0.0;
-        // let counter = 0;
-        // const beatLength = this.$store.getters.beatLength;
-        // this.originalBlocks.push({
-        //   startPos: 0,
-        //   endPos: this.$store.state.startOffset,
-        //   id: counter
-        // });
-        // time += this.$store.state.startOffset;
-        // counter++;
-        // while (time < buf.duration) {
-        //   this.originalBlocks.push({
-        //     startPos: time,
-        //     endPos: time + beatLength,
-        //     id: counter
-        //   });
-        //   counter++;
-        //   time += beatLength;
-        // }
-      });
+    
   },
   methods: {
     genSoundBlock: function(s, e) {
@@ -112,6 +77,18 @@ export default {
       } else {
         return "other";
       }
+    }
+  },
+  computed: {
+    buffer: function() {
+      return this.$store.state.buffer;
+    }
+  },
+  watch: {
+    buffer: async function(n, o) {
+      const res = await test(n);
+      this.$store.commit("setStartOffset", res.offset);
+      this.$store.commit("setBpm", Math.round(res.bpm));
     }
   }
 };
