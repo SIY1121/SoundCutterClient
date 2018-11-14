@@ -48,7 +48,7 @@ export default {
         this.$store.commit("setMBuffer", buf);
       });
 
-    fetch("/sl.mp3")
+    fetch("/od.webm")
       .then(res => {
         return res.arrayBuffer();
       })

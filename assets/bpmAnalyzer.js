@@ -87,11 +87,11 @@ const getTempos = (peaks, sampleRate) => {
         count: 1
       };
 
-      while (group.tempo < 90) {
+      while (group.tempo < 95) {
         group.tempo *= 2;
       }
 
-      while (group.tempo > 180) {
+      while (group.tempo > 190) {
         group.tempo /= 2;
       }
 
@@ -122,5 +122,5 @@ const getFirstBeatOffset = (data, sampleRate) => {
   let beatSampleCount = 60 / data.tempo * sampleRate;
   while (pos - beatSampleCount > 0)
     pos -= beatSampleCount;
-  return pos / beatSampleCount / 2 / 4;
+  return pos / sampleRate;
 }
