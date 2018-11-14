@@ -7,6 +7,7 @@ const createStore = () => {
       context: null,
       buffer: null,
       rawBuffer: null,
+      mBuffer: null,
       playingBlock: 0,// 再生中のブロックのインデックス
       blockSpesificId: 0,// 一意のidを生成するためのもの
       bpm: 0,
@@ -21,6 +22,9 @@ const createStore = () => {
       setBuffer(state, buffer) {
         state.buffer = buffer;
         state.rawBuffer = buffer.getChannelData(0);
+      },
+      setMBuffer(state, buffer){
+        state.mBuffer = buffer;
       },
       setBpm(state, bpm) {
         state.bpm = bpm;

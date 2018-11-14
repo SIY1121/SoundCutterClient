@@ -36,8 +36,18 @@ export default {
     this.$store.commit("setDevice", this.detectDevice());
     window.AudioContext = window.AudioContext || window.webkitAudioContext;
     this.$store.commit("initContext", new AudioContext());
+    fetch("/m.ogg")
+      .then(res => {
+        return res.arrayBuffer();
+      })
+      .then(buf => {
+        return this.$store.state.context.decodeAudioData(buf);
+      })
+      .then(buf => {
+        this.$store.commit("setMBuffer", buf);
+      });
 
-    fetch("/sanjo.mp3")
+    fetch("/h.mp3")
       .then(res => {
         return res.arrayBuffer();
       })
@@ -49,7 +59,16 @@ export default {
         return analyze(buf);
       })
       .then(bpm => {
-        this.$store.commit("setStartOffset", 1.358);
+        for (let i = 0; i < this.$store.state.rawBuffer.length; i++) {
+          if (Math.abs(this.$store.state.rawBuffer[i]) > 0.05) {
+            this.$store.commit(
+              "setStartOffset",
+              i / this.$store.state.buffer.sampleRate - 0.024
+            );
+            break;
+          }
+        }
+        //this.$store.commit("setStartOffset", 1.358);
         //this.$store.commit("setStartOffset", 0.770);
         this.$store.commit("setBpm", Math.round(bpm));
         // const bl = 60.0 / this.$store.state.bpm;
@@ -84,8 +103,8 @@ export default {
       });
       this.$store.commit("genBlock");
     },
-    append: function(data){
-      this.genSoundBlock(data.startPos,data.endPos);
+    append: function(data) {
+      this.genSoundBlock(data.startPos, data.endPos);
     },
     detectDevice: function() {
       const ua = navigator.userAgent;
