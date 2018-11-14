@@ -2,34 +2,13 @@ export default async (buffer) => {
   const filteredBuffer = await filter(buffer);
 
   const rawBuffer = filteredBuffer.getChannelData(0);
-
-  let peakArray = [];
-  let threshold = 0.95
-  while (peakArray.length < 100 || peakArray.length > 150) {
-    peakArray = getPeaksAtThreshold(rawBuffer, threshold);
-    threshold -= 0.05;
-  }
-
-  console.log(peakArray);
-  const intervalCounts = countIntervalsBetweenNearbyPeaks(peakArray);
-  intervalCounts.sort((a, b) => {
-    if (a.count > b.count) return -1;
-    if (a.count < b.count) return 1;
-    return 0;
-  });
-  const tempoCounts = groupNeighborsByTempo(intervalCounts, buffer.sampleRate);
-
-  tempoCounts.sort((a, b) => {
-    if (a.count > b.count) return -1;
-    if (a.count < b.count) return 1;
-    return 0;
-  });
-
-  const offset = getFirstBeatOffset(intervalCounts[0].interval, peakArray, tempoCounts[0].count, buffer.sampleRate);
-  console.log(tempoCounts);
+  const peaks = getPeaks(rawBuffer, buffer.sampleRate);
+  const tempos = getTempos(peaks, buffer.sampleRate)
+  const offset = getFirstBeatOffset(tempos[0], buffer.sampleRate);
+  console.log(tempos);
   console.log(offset);
   return {
-    bpm: tempoCounts[0].tempo,
+    bpm: tempos[0].tempo,
     offset: offset
   };
 }
@@ -65,82 +44,83 @@ const filter = async (buffer) => {
   return offlineContext.startRendering()
 }
 
-const getPeaksAtThreshold = (data, threshold) => {
-  var peaksArray = [];
-  var length = data.length;
-  for (var i = 0; i < length;) {
-    if (data[i] > threshold) {
-      peaksArray.push(i);
-      // Skip forward ~ 1/4s to get past this peak.
-      i += 10000;
+const getPeaks = (data, sampleRate) => {
+  let partSize = sampleRate / 2,
+    parts = data.length / partSize,
+    peaks = [];
+
+  for (let i = 0; i < parts; i++) {
+    let max = 0;
+    for (let j = i * partSize; j < (i + 1) * partSize; j++) {
+      const volume = Math.abs(data[j]);
+      if (!max || (volume > max.volume)) {
+        max = {
+          position: j,
+          volume: volume
+        };
+      }
     }
-    i++;
+    peaks.push(max);
   }
-  return peaksArray;
+  peaks.sort((a, b) => {
+    return b.volume - a.volume;
+  });
+
+  peaks = peaks.splice(0, peaks.length * 0.5);
+
+  peaks.sort((a, b) => {
+    return a.position - b.position;
+  });
+
+  return peaks;
 }
 
-const countIntervalsBetweenNearbyPeaks = (peaks) => {
-  var intervalCounts = [];
+const getTempos = (peaks, sampleRate) => {
+  var groups = [];
+
   peaks.forEach((peak, index) => {
-    for (var i = 1; i < 10; i++) {
-      if (index + i >= peaks.length) break;
-      var interval = peaks[index + i] - peak;
-      var foundInterval = intervalCounts.some((intervalCount) => {
-        if (intervalCount.interval === interval)
-          return intervalCount.count++;
-      });
-      if (!foundInterval) {
-        intervalCounts.push({
-          interval: interval,
-          count: 1
-        });
+    for (let i = 1;
+      (index + i) < peaks.length && i < 10; i++) {
+      const group = {
+        tempo: (60 * sampleRate) / (peaks[index + i].position - peak.position),
+        positions: [],
+        count: 1
+      };
+
+      while (group.tempo < 90) {
+        group.tempo *= 2;
+      }
+
+      while (group.tempo > 180) {
+        group.tempo /= 2;
+      }
+
+      group.tempo = Math.round(group.tempo);
+
+      if (!(groups.some((interval) => {
+          if (interval.tempo === group.tempo) {
+            interval.count++;
+            interval.positions.push(peak.position);
+            return true;
+          } else
+            return false;
+      }))) {
+        group.positions.push(peak.position);
+        groups.push(group);
       }
     }
   });
-  return intervalCounts;
+
+  groups.sort((a, b) => b.count - a.count);
+
+  return groups;
 }
 
-const groupNeighborsByTempo = (intervalCounts, sampleRate) => {
-  var tempoCounts = []
-  intervalCounts.forEach(function (intervalCount, i) {
-    // Convert an interval to tempo
-    var theoreticalTempo = 60 / (intervalCount.interval / sampleRate);
-
-    // Adjust the tempo to fit within the 90-180 BPM range
-    while (theoreticalTempo < 95) theoreticalTempo *= 2;
-    while (theoreticalTempo > 190) theoreticalTempo /= 2;
-
-    var foundTempo = tempoCounts.some(function (tempoCount) {
-      if (tempoCount.tempo === theoreticalTempo)
-        return tempoCount.count += intervalCount.count;
-    });
-    if (!foundTempo) {
-      tempoCounts.push({
-        tempo: theoreticalTempo,
-        count: intervalCount.count
-      });
-    }
-  });
-  return tempoCounts;
-}
-
-const getFirstBeatOffset = (interval, peaks, max, sampleRate) => {
-  let offset = 0;
-  let counter = 0;
-  for (let i = 0; i < peaks.length; i++) {
-    for (let j = 1; j < 10; j++)
-      if (peaks[i + j] - peaks[i] == interval) {
-        counter++;
-        console.log("f");
-        if (counter > max / 2) {
-          let peak = peaks[i];
-          while (peak - interval > 0) {
-            peak -= interval;
-          }
-          offset = peak;
-          break;
-        }
-      }
-  }
-  return offset / sampleRate;
+const getFirstBeatOffset = (data, sampleRate) => {
+  let pos = data.positions[Math.round(data.positions.length / 2)];
+  console.log(data);
+  let beatSampleCount = 60 / data.tempo * sampleRate;
+  while (pos - beatSampleCount > 0)
+    pos -= beatSampleCount;
+  return pos / beatSampleCount / 2 / 4;
 }

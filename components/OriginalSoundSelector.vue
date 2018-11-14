@@ -8,7 +8,7 @@
         <button @click="selectStart">[</button>
         <button @click="selectEnd">]</button>
         <button @click="$emit('select',{startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">↓</button>
-        <audio id="originalTrack" src="/bd.mp3"/>
+        <audio id="originalTrack" src="/sl.mp3"/>
         <input type="number" step="0.001" :value="startOffset" @input="updateStartOffset">
     </div>
 </template>

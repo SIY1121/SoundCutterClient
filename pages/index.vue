@@ -48,7 +48,7 @@ export default {
         this.$store.commit("setMBuffer", buf);
       });
 
-    fetch("/bd.mp3")
+    fetch("/sl.mp3")
       .then(res => {
         return res.arrayBuffer();
       })
