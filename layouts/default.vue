@@ -1,13 +1,25 @@
 <template>
   <div>
-    <nuxt/>
+    <nav>
+      <div class="nav-wrapper">
+        <div class="container">
+          <a href="#" class="brand-logo"><i class="material-icons">music_note</i></a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><nuxt-link to="/about">about</nuxt-link></li>
+            <li><a href="badges.html">Components</a></li>
+            <li><a href="collapsible.html">JavaScript</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <nuxt class="container"/>
   </div>
 </template>
 
 <style>
 html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;

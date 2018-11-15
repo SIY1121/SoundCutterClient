@@ -1,21 +1,36 @@
 <template>
     <div>
-        <div class="flex">
-            <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
+        <div v-if="file.prepared" class="flex">
+          <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>
-        <button @click="playPause">play</button>
-        <button @click="audioElm.currentTime = 0;playingBlockIndex = 0">s</button>
-        <button @click="selectStart">[</button>
-        <button @click="selectEnd">]</button>
-        <button @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">↓</button>
+        <div v-if="!file.prepared" class="progress">
+          <div class="indeterminate"></div>
+        </div>
+        <button class="btn-floating waves-effect waves-light btn" @click="playPause">
+          <i class="material-icons">play_arrow</i>
+        </button>
+        <button class="btn-floating waves-effect waves-light" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
+          <i class="material-icons">skip_previous</i>
+        </button>
+        <button class="btn-floating waves-effect waves-light" @click="selectStart">
+          <i class="material-icons">first_page</i>
+        </button>
+        <button class="btn-floating waves-effect waves-light" @click="selectEnd">
+          <i class="material-icons">last_page</i>
+        </button>
+        <button class="btn-floating waves-effect waves-light" @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">
+          <i class="material-icons">vertical_align_bottom</i>
+        </button>
         <audio :id="audioElmId" :src="file.dataURL"/>
         <input type="number" step="0.001" :value="file.startOffset" @input="updateStartOffset">
+        <button @click="encode">encode</button>
     </div>
 </template>
 
 <script>
 import OriginalSoundBlock from "~/components/OriginalSoundBlock.vue";
 import analyze from "~/assets/bpmAnalyzer.js";
+import saveAs from "file-saver";
 
 export default {
   components: {
@@ -152,16 +167,47 @@ export default {
       this.mSource.connect(this.$store.state.context.destination);
       this.mSource.start(0);
     },
-    updateStartOffset:function(e){
+    updateStartOffset: function(e) {
       this.file.startOffset = Number(e.target.value);
       this.init();
+    },
+    encode: function() {
+      const worker = new window.Worker("/worker.js");
+      // worker.onmessage = e => {
+      //   if (e.data[0] == "next1")
+      //     worker.postMessage([
+      //       "post",
+      //       this.file.buffer.getChannelData(0),
+      //       this.file.buffer.getChannelData(1)
+      //     ]);
+      //   else if (e.data[0] == "next2")
+      //     setTimeout(() => {
+      //       worker.postMessage(["done"]);
+      //     }, 5000);
+      //   else{
+      //     saveAs(e.data[1], "test.mp3");
+      //     worker.terminate();
+      //   }
+      // };
+      // worker.postMessage(["config", this.file.buffer.sampleRate]);
+      worker.onmessage = e =>{
+        saveAs(e.data[0],"test.mp3");
+      }
+      worker.postMessage([
+        this.file.buffer.sampleRate,
+        this.file.buffer.getChannelData(0),
+        this.file.buffer.getChannelData(1)
+      ]);
+
+      // const encoder = new Mp3LameEncoder(this.file.buffer.sampleRate,192);
+      // encoder.encode([this.file.buffer.getChannelData(0),this.file.buffer.getChannelData(1)]);
+      // saveAs(encoder.finish(),"test.mp3");
     }
   },
   computed: {
     audioElmId: function() {
       return "OriginalTrack" + this.file.id;
-    },
-    
+    }
   },
   mounted: async function() {
     await this.prepareData();
@@ -176,5 +222,12 @@ export default {
   display: flex;
   flex-wrap: no-wrap;
   overflow: scroll;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

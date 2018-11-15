@@ -1,6 +1,9 @@
 <template>
     <div>
-        <input type="file" id="file" @change="onFileSelect"/>
+      <label for="file" class="waves-effect waves-light btn">
+        <input type="file" id="file" @change="onFileSelect" style="display:none"/>
+        <i class="material-icons">add</i>
+      </label>
     </div>
 </template>
 
