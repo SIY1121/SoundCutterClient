@@ -5,7 +5,26 @@
       <div>
         <origianl-sound-selector v-for="(file,index) in files" :file="file" v-bind:key="file.id" @select="selected"/>
       </div>
-      <edit-area/>      
+      <edit-area/>
+      <md-button class="md-raised md-accent" @click="save">Save<md-icon>save_alt</md-icon></md-button>
+
+      <md-dialog :md-active.sync="showDialog">
+        <md-dialog-title>処理中です</md-dialog-title>
+        <div class="content">
+          <p>
+            現在書き出し処理中です。  
+          </p>
+        </div>
+        <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
+        <md-dialog-actions>
+          <md-button class="md-primary" @click="showDialog = false">Cancel</md-button>
+          <md-button class="md-primary" @click="showDialog = false">Close</md-button>
+        </md-dialog-actions>
+      </md-dialog>
+      <md-snackbar md-position="center" md-duration="5000" :md-active.sync="showSnackbar" md-persistent>
+        <span>出力が完了しました</span>
+        <md-button class="md-primary" @click="showSnackbar = false">OK</md-button>
+      </md-snackbar>
     </div>
   </section>
 </template>
@@ -19,6 +38,8 @@ import EditArea from "~/components/EditArea.vue";
 import { analyze } from "web-audio-beat-detector";
 import test from "~/assets/bpmAnalyzer.js";
 
+import saveAs from "file-saver";
+
 export default {
   components: {
     Logo,
@@ -28,7 +49,11 @@ export default {
     EditArea
   },
   data: function() {
-    return {};
+    return {
+      showDialog: false,
+      showSnackbar: false,
+      progress: 0,
+    };
   },
   mounted: function() {
     this.$store.commit("setDevice", this.detectDevice());
@@ -46,12 +71,53 @@ export default {
       });
   },
   methods: {
-    selected: function(data){
-      this.$store.commit("addBlock",{
+    selected: function(data) {
+      this.$store.commit("addBlock", {
         startPos: data.startPos,
         endPos: data.endPos,
         fileId: data.fileId
       });
+    },
+    save: function() {
+      this.showDialog = true;
+      const worker = new window.Worker("/worker.js");
+      let index = 0;
+      worker.onmessage = e => {
+        if (e.data[0] == "done") {
+          saveAs(e.data[1], "save.mp3");
+          worker.terminate();
+          this.showDialog = false;
+          this.showSnackbar = true;
+        } else {
+          this.progress = index / this.$store.state.soundBlocks.length * 100;
+          if (index == this.$store.state.soundBlocks.length) {
+            worker.postMessage(["done"]);
+            return;
+          }
+          const b = this.$store.state.soundBlocks[index];
+          const f = this.$store.state.files.find(el => el.id == b.fileId);
+          index++;
+          worker.postMessage([
+            "post",
+            f.buffer
+              .getChannelData(0)
+              .slice(
+                b.startPos * f.buffer.sampleRate,
+                b.endPos * f.buffer.sampleRate
+              ),
+            f.buffer
+              .getChannelData(1)
+              .slice(
+                b.startPos * f.buffer.sampleRate,
+                b.endPos * f.buffer.sampleRate
+              )
+          ]);
+        }
+      };
+      worker.postMessage([
+        "config",
+        this.$store.state.files[0].buffer.sampleRate
+      ]);
     },
     detectDevice: function() {
       const ua = navigator.userAgent;
@@ -83,6 +149,10 @@ export default {
   justify-content: center;
   align-items: center;
   text-align: center; */
+}
+
+.content {
+  padding: 10px;
 }
 
 .flex {

@@ -86,4 +86,7 @@ div:hover{
   background-color: yellow;
 }
 
+canvas {
+  max-width:none;
+}
 </style>

@@ -1,9 +1,9 @@
 <template>
     <div>
-      <label for="file" class="waves-effect waves-light btn">
-        <input type="file" id="file" @change="onFileSelect" style="display:none"/>
-        <i class="material-icons">add</i>
-      </label>
+      <input type="file" id="file" @change="onFileSelect" style="display:none"/>
+      <md-button class="md-raised" @click="damyClick">
+        <md-icon>add</md-icon>
+      </md-button>
     </div>
 </template>
 
@@ -11,6 +11,9 @@
 export default {
   name: "FileSelector",
   methods: {
+    damyClick:function(){
+      window.document.querySelector('#file').click()
+    },
     onFileSelect: function(e) {
       const f = e.target.files[0];
 

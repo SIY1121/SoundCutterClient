@@ -3,34 +3,32 @@
         <div v-if="file.prepared" class="flex">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>
-        <div v-if="!file.prepared" class="progress">
-          <div class="indeterminate"></div>
+        <div v-if="!file.prepared">
+          <md-progress-bar md-mode="indeterminate"></md-progress-bar>
         </div>
-        <button class="btn-floating waves-effect waves-light btn" @click="playPause">
-          <i class="material-icons">play_arrow</i>
-        </button>
-        <button class="btn-floating waves-effect waves-light" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
-          <i class="material-icons">skip_previous</i>
-        </button>
-        <button class="btn-floating waves-effect waves-light" @click="selectStart">
-          <i class="material-icons">first_page</i>
-        </button>
-        <button class="btn-floating waves-effect waves-light" @click="selectEnd">
-          <i class="material-icons">last_page</i>
-        </button>
-        <button class="btn-floating waves-effect waves-light" @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">
-          <i class="material-icons">vertical_align_bottom</i>
-        </button>
+        <md-button class="md-icon-button md-raised md-primary" @click="playPause">
+          <md-icon>play_arrow</md-icon>
+        </md-button>
+        <md-button class="md-icon-button md-raised" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
+          <md-icon>skip_previous</md-icon>
+        </md-button>
+        <md-button class="md-icon-button md-raised" @click="selectStart">
+          <md-icon>first_page</md-icon>
+        </md-button>
+        <md-button class="md-icon-button md-raised" @click="selectEnd">
+          <md-icon>last_page</md-icon>
+        </md-button>
+        <md-button class="md-icon-button md-raised md-accent" @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">
+          <md-icon>vertical_align_bottom</md-icon>
+        </md-button>
         <audio :id="audioElmId" :src="file.dataURL"/>
         <input type="number" step="0.001" :value="file.startOffset" @input="updateStartOffset">
-        <button @click="encode">encode</button>
     </div>
 </template>
 
 <script>
 import OriginalSoundBlock from "~/components/OriginalSoundBlock.vue";
 import analyze from "~/assets/bpmAnalyzer.js";
-import saveAs from "file-saver";
 
 export default {
   components: {
@@ -113,7 +111,7 @@ export default {
 
       clearInterval(this.intervalId);
       this.intervalId = setInterval(() => {
-        this.position = this.audioElm.currentTime;
+        this.position = this.audioElm.currentTime + 0.1;
         for (let i = this.playingBlockIndex; i < this.blocks.length; i++) {
           if (
             this.blocks[i].startPos < this.position &&
@@ -170,20 +168,6 @@ export default {
     updateStartOffset: function(e) {
       this.file.startOffset = Number(e.target.value);
       this.init();
-    },
-    encode: function() {
-      const worker = new window.Worker("/worker.js");
-      worker.onmessage = e => {
-        saveAs(e.data[1], "test.mp3");
-        worker.terminate();
-      };
-      worker.postMessage(["config", this.file.buffer.sampleRate]);
-      worker.postMessage([
-        "post",
-        this.file.buffer.getChannelData(0),
-        this.file.buffer.getChannelData(1)
-      ]);
-      worker.postMessage(["done"]);
     }
   },
   computed: {

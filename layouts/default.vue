@@ -1,22 +1,35 @@
 <template>
-  <div>
-    <nav>
-      <div class="nav-wrapper">
-        <div class="container">
-          <a href="#" class="brand-logo"><i class="material-icons">music_note</i></a>
-          <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><nuxt-link to="/about">about</nuxt-link></li>
-            <li><a href="badges.html">Components</a></li>
-            <li><a href="collapsible.html">JavaScript</a></li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    <nuxt class="container"/>
+  <div class="md-scrollbar">
+   <md-app>
+      <md-app-toolbar class="md-primary">
+        <span class="md-title" style="flex: 1">SoundCutter</span>
+        <nuxt-link to="/about"><md-button>About</md-button></nuxt-link>
+      </md-app-toolbar>
+      <md-app-content>
+        <nuxt class="container"/>
+      </md-app-content>
+      </md-app>
   </div>
 </template>
 
-<style>
+<script>
+export default{
+
+}
+</script>
+
+
+<style lang="scss">
+@import "~vue-material/dist/theme/engine"; // Import the theme engine
+
+@include md-register-theme("default", (
+  primary: md-get-palette-color(amber, A700), // The primary color of your application
+  accent: md-get-palette-color(red, A200) // The accent or secondary color
+));
+
+@import "~vue-material/dist/theme/all"; // Apply the theme
+
+
 html {
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;

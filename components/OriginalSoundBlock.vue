@@ -1,6 +1,6 @@
 <template>
     <div @click="$emit('select',{startPos:startPos,index: index})">
-        <div class="handle">::</div>
+        <div class="handle"></div>
         <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing,selecting : selecting}">
         </canvas>
     </div>
@@ -57,6 +57,10 @@ export default {
 <style lang="scss" scoped>
 div:hover {
   background-color: aqua;
+}
+
+canvas {
+  max-width: none;
 }
 
 .active {
