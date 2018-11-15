@@ -173,35 +173,17 @@ export default {
     },
     encode: function() {
       const worker = new window.Worker("/worker.js");
-      // worker.onmessage = e => {
-      //   if (e.data[0] == "next1")
-      //     worker.postMessage([
-      //       "post",
-      //       this.file.buffer.getChannelData(0),
-      //       this.file.buffer.getChannelData(1)
-      //     ]);
-      //   else if (e.data[0] == "next2")
-      //     setTimeout(() => {
-      //       worker.postMessage(["done"]);
-      //     }, 5000);
-      //   else{
-      //     saveAs(e.data[1], "test.mp3");
-      //     worker.terminate();
-      //   }
-      // };
-      // worker.postMessage(["config", this.file.buffer.sampleRate]);
-      worker.onmessage = e =>{
-        saveAs(e.data[0],"test.mp3");
-      }
+      worker.onmessage = e => {
+        saveAs(e.data[1], "test.mp3");
+        worker.terminate();
+      };
+      worker.postMessage(["config", this.file.buffer.sampleRate]);
       worker.postMessage([
-        this.file.buffer.sampleRate,
+        "post",
         this.file.buffer.getChannelData(0),
         this.file.buffer.getChannelData(1)
       ]);
-
-      // const encoder = new Mp3LameEncoder(this.file.buffer.sampleRate,192);
-      // encoder.encode([this.file.buffer.getChannelData(0),this.file.buffer.getChannelData(1)]);
-      // saveAs(encoder.finish(),"test.mp3");
+      worker.postMessage(["done"]);
     }
   },
   computed: {
