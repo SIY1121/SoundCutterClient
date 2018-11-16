@@ -64,6 +64,7 @@ module.exports = {
     ['nuxt-vue-material', {
       theme: null,
     }],
+    '@nuxtjs/pwa'
   ],
   /*
    ** Axios module configuration
@@ -72,6 +73,14 @@ module.exports = {
     // See https://github.com/nuxt-community/axios-module#options
   },
 
+  manifest: {
+    name: "SoundCutter",
+    lang: 'ja'
+  },
+
+  workbox: {
+    offlineAssets:["/m.ogg","/Mp3LameEncoder.js","/worker.js"]
+  },
   /*
    ** Build configuration
    */

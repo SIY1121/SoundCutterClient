@@ -1,6 +1,13 @@
 <template>
   <section class="container">
-    <div>
+    <md-empty-state v-if="this.files.length == 0"
+      md-rounded
+      md-icon="equalizer"
+      md-label="プロジェクトが空です"
+      md-description="楽曲を追加しましょう">
+      <file-selector/>
+    </md-empty-state>
+    <div v-else>
       <file-selector/>
       <div>
         <origianl-sound-selector v-for="(file,index) in files" :file="file" v-bind:key="file.id" @select="selected"/>

@@ -4,6 +4,7 @@
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>
         <div v-if="!file.prepared">
+          <p> {{ this.file.msg }}</p>
           <md-progress-bar md-mode="indeterminate"></md-progress-bar>
         </div>
         <md-button class="md-icon-button md-raised md-primary" @click="playPause">
@@ -53,6 +54,7 @@ export default {
   methods: {
     prepareData: function() {
       return new Promise(resolve => {
+        this.file.msg = "ファイルを読み込み中";
         const reader = new FileReader();
         const reader2 = new FileReader();
         const vue = this;
@@ -61,6 +63,9 @@ export default {
             f.target.result
           );
           vue.file.buffer = buf;
+
+          this.file.msg = "テンポを検出中";
+
           vue.file.rawBuffer = buf.getChannelData(0);
           const res = await analyze(buf);
           vue.file.bpm = res.bpm;
@@ -79,6 +84,7 @@ export default {
       });
     },
     init: function() {
+      this.file.msg = "音声を解析中";
       this.blocks.splice(0, this.blocks.length);
       const buf = this.file.buffer;
       let time = 0.0;

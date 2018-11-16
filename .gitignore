@@ -82,3 +82,6 @@ dist
 
 # firebase
 .firebase
+
+#pwa
+sw.*

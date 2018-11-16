@@ -1,12 +1,12 @@
 <template>
-  <div class="md-scrollbar">
+  <div>
    <md-app>
       <md-app-toolbar class="md-primary">
         <span class="md-title" style="flex: 1">SoundCutter</span>
         <nuxt-link to="/about"><md-button>About</md-button></nuxt-link>
       </md-app-toolbar>
-      <md-app-content>
-        <nuxt class="container"/>
+      <md-app-content  class="md-scrollbar">
+        <nuxt/>
       </md-app-content>
       </md-app>
   </div>

@@ -1,7 +1,8 @@
 <template>
     <div>
       <input type="file" id="file" @change="onFileSelect" style="display:none"/>
-      <md-button class="md-raised" @click="damyClick">
+      <md-button class="md-raised md-accent" @click="damyClick">
+        ファイルを選択
         <md-icon>add</md-icon>
       </md-button>
     </div>
@@ -27,7 +28,8 @@ export default {
         bpm: 0,
         beatLength: 0,
         startOffset: 0,
-        prepared: false
+        prepared: false,
+        msg: ""
       };
 
       this.$store.commit("addFile", file);
