@@ -5,7 +5,7 @@
         <span class="md-title" style="flex: 1">SoundCutter</span>
         <nuxt-link to="/about"><md-button>About</md-button></nuxt-link>
       </md-app-toolbar>
-      <md-app-content  class="md-scrollbar">
+      <md-app-content style="min-height:100vw">
         <nuxt/>
       </md-app-content>
       </md-app>

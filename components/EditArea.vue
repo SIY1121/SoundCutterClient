@@ -44,7 +44,7 @@ export default {
   position: relative;
   display: flex;
   flex-wrap: no-wrap;
-  overflow: scroll;
+  overflow-x: scroll;
 }
 .container {
   padding:5px;

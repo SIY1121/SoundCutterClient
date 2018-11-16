@@ -26,6 +26,7 @@ export default {
         rawBuffer: null,
         dataURL: null,
         bpm: 0,
+        bpmList: [],
         beatLength: 0,
         startOffset: 0,
         prepared: false,

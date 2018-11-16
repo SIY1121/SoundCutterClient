@@ -8,7 +8,7 @@ export default async (buffer) => {
   console.log(tempos);
   console.log(offset);
   return {
-    bpm: tempos[0].tempo,
+    bpm: tempos.slice(0, 5).map(el => el.tempo),
     offset: offset
   };
 }
@@ -104,7 +104,7 @@ const getTempos = (peaks, sampleRate) => {
             return true;
           } else
             return false;
-      }))) {
+        }))) {
         group.positions.push(peak.position);
         groups.push(group);
       }

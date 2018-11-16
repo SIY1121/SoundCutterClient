@@ -1,7 +1,23 @@
 <template>
     <div class="container md-elevation-2">
-        <div> {{ file.name }}: {{ file.bpm }}bpm </div>
-        <div v-if="file.prepared" class="flex">
+        <div>
+          {{ file.name }}
+        </div>
+        <div class="md-layout-item inline">
+          <md-field>
+            <label for="bpm">BPM</label>
+            <md-select v-model.number="file.bpm" name="bpm" id="bpm" md-dense>
+              <md-option disabled>候補</md-option>
+              <md-option v-for="item in file.bpmList" :key="item" :value="item"> {{ item }} </md-option>
+            </md-select>
+          </md-field>
+        </div>
+        <md-field class="inline">
+          <label>開始位置</label>
+          <md-input v-model.number="file.startOffset"></md-input>
+        </md-field>
+        
+        <div v-if="file.prepared" class="flex ">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>
         <div v-if="!file.prepared">
@@ -29,7 +45,6 @@
           <md-tooltip md-direction="top">タイムラインにコピー</md-tooltip>
         </md-button>
         <audio :id="audioElmId" :src="file.dataURL"/>
-        <input type="number" step="0.001" :value="file.startOffset" @input="updateStartOffset">
     </div>
 </template>
 
@@ -74,8 +89,9 @@ export default {
 
           vue.file.rawBuffer = buf.getChannelData(0);
           const res = await analyze(buf);
-          vue.file.bpm = res.bpm;
-          vue.file.beatLength = 60 / res.bpm;
+          vue.file.bpm = res.bpm[0];
+          vue.file.bpmList = res.bpm;
+          vue.file.beatLength = 60 / res.bpm[0];
           vue.file.startOffset = res.offset;
 
           reader2.onload = d => {
@@ -90,6 +106,7 @@ export default {
       });
     },
     init: function() {
+      this.file.prepared = false;
       this.file.msg = "音声を解析中";
       this.blocks.splice(0, this.blocks.length);
       const buf = this.file.buffer;
@@ -185,6 +202,21 @@ export default {
   computed: {
     audioElmId: function() {
       return "OriginalTrack" + this.file.id;
+    },
+    bpm: function(){
+      return this.file.bpm;
+    },
+    startOffset: function(){
+      return this.file.startOffset;
+    }
+  },
+  watch:{
+    bpm :function(n,o){
+      this.file.beatLength = 60 / n;
+      this.init();
+    },
+    startOffset: function(n,o){
+      this.init();
     }
   },
   mounted: async function() {
@@ -200,11 +232,15 @@ export default {
 .container {
   padding: 5px;
 }
+.inline {
+  display:inline-block;
+  width:initial;
+}
 .flex {
   position: relative;
   display: flex;
   flex-wrap: no-wrap;
-  overflow: scroll;
+  overflow-x: scroll;
 }
 .fade-enter-active,
 .fade-leave-active {
