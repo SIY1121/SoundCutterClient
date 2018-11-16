@@ -1,26 +1,32 @@
 <template>
-    <div>
+    <div class="container md-elevation-2">
+        <div> {{ file.name }}</div>
         <div v-if="file.prepared" class="flex">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>
         <div v-if="!file.prepared">
-          <p> {{ this.file.msg }}</p>
+          <p class="md-title"> {{ this.file.msg }}</p>
           <md-progress-bar md-mode="indeterminate"></md-progress-bar>
         </div>
         <md-button class="md-icon-button md-raised md-primary" @click="playPause">
           <md-icon>play_arrow</md-icon>
+          <md-tooltip md-direction="top">再生</md-tooltip>
         </md-button>
         <md-button class="md-icon-button md-raised" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
           <md-icon>skip_previous</md-icon>
+          <md-tooltip md-direction="top">先頭に戻る</md-tooltip>
         </md-button>
         <md-button class="md-icon-button md-raised" @click="selectStart">
           <md-icon>first_page</md-icon>
+          <md-tooltip md-direction="top">始点を選択</md-tooltip>
         </md-button>
         <md-button class="md-icon-button md-raised" @click="selectEnd">
           <md-icon>last_page</md-icon>
+          <md-tooltip md-direction="top">終点を選択</md-tooltip>
         </md-button>
         <md-button class="md-icon-button md-raised md-accent" @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">
           <md-icon>vertical_align_bottom</md-icon>
+          <md-tooltip md-direction="top">タイムラインにコピー</md-tooltip>
         </md-button>
         <audio :id="audioElmId" :src="file.dataURL"/>
         <input type="number" step="0.001" :value="file.startOffset" @input="updateStartOffset">
@@ -182,13 +188,18 @@ export default {
     }
   },
   mounted: async function() {
-    await this.prepareData();
+    if (!this.file.prepared) {
+      await this.prepareData();
+    }
     this.init();
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.container {
+  padding: 5px;
+}
 .flex {
   position: relative;
   display: flex;

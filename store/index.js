@@ -36,6 +36,12 @@ const createStore = () => {
         block.file = state.files.find(el => el.id === block.fileId);
         state.soundBlocks.push(block);
       },
+      setAllBlock(state, blocks) {
+        state.soundBlocks.splice(0, state.soundBlocks.length);
+        blocks.forEach(block =>
+          state.soundBlocks.push(block)
+        );
+      },
       setDevice(state, d) {
         state.device = d;
       },

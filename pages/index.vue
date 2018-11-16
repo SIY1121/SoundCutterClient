@@ -12,6 +12,7 @@
       <div>
         <origianl-sound-selector v-for="(file,index) in files" :file="file" v-bind:key="file.id" @select="selected"/>
       </div>
+      <md-divider class="divider"></md-divider>
       <edit-area/>
       <md-button class="md-raised md-accent" @click="save">Save<md-icon>save_alt</md-icon></md-button>
 
@@ -149,13 +150,17 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .container {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   /* display: flex;
   justify-content: center;
   align-items: center;
   text-align: center; */
+}
+
+.divider {
+  margin : 15px;
 }
 
 .content {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="handle">::</div>
+        <div ><md-icon class="handle">drag_indicator</md-icon></div>
         <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing}" @click="play">
         </canvas>
     </div>
@@ -9,7 +9,7 @@
 <script>
 export default {
   name: "SoundBlock",
-  props: ["startPos", "endPos", "index", "id","file"],
+  props: ["startPos", "endPos", "index", "id", "file"],
   data: function() {
     return {
       playing: false
@@ -78,8 +78,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-div:hover{
-    background-color:aqua;
+.container {
+  display:inline-block;
+}
+
+div:hover {
+  background-color: aqua;
+}
+
+.handle {
+  cursor:move;
 }
 
 .active {
@@ -87,6 +95,6 @@ div:hover{
 }
 
 canvas {
-  max-width:none;
+  max-width: none;
 }
 </style>
