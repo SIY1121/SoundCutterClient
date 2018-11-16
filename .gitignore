@@ -85,3 +85,5 @@ dist
 
 #pwa
 sw.*
+
+/static/test
