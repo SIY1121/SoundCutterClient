@@ -87,11 +87,11 @@ const getTempos = (peaks, sampleRate) => {
         count: 1
       };
 
-      while (group.tempo < 95) {
+      while (group.tempo < 100) {
         group.tempo *= 2;
       }
 
-      while (group.tempo > 190) {
+      while (group.tempo > 200) {
         group.tempo /= 2;
       }
 

@@ -24,7 +24,6 @@ export default {
         name: f.name,
         buffer: null,
         rawBuffer: null,
-        dataURL: null,
         bpm: 0,
         bpmList: [],
         beatLength: 0,

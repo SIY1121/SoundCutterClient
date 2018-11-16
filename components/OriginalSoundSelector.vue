@@ -3,48 +3,57 @@
         <div>
           {{ file.name }}
         </div>
-        <div class="md-layout-item inline">
-          <md-field>
-            <label for="bpm">BPM</label>
-            <md-select v-model.number="file.bpm" name="bpm" id="bpm" md-dense>
-              <md-option disabled>候補</md-option>
-              <md-option v-for="item in file.bpmList" :key="item" :value="item"> {{ item }} </md-option>
-            </md-select>
+        <div v-if="file.prepared">
+            <div class="md-layout-item inline">
+            <md-field>
+              <label for="bpm">BPM</label>
+              <md-select v-model.number="file.bpm" name="bpm" id="bpm" md-dense>
+                <md-option disabled>候補</md-option>
+                <md-option v-for="item in file.bpmList" :key="item" :value="item"> {{ item }} </md-option>
+              </md-select>
+            </md-field>
+          </div>
+          <md-field class="inline">
+            <label>開始位置</label>
+            <md-input v-model.number="file.startOffset"></md-input>
           </md-field>
+          <md-switch v-model="metroOn">メトロノーム</md-switch>
+          <md-switch v-model="trackOn">追従</md-switch>
+          <div>{{ displayPosition }}</div>
         </div>
-        <md-field class="inline">
-          <label>開始位置</label>
-          <md-input v-model.number="file.startOffset"></md-input>
-        </md-field>
         
-        <div v-if="file.prepared" class="flex ">
+        
+        <div v-if="file.prepared" class="flex" :id="containerId">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>
         <div v-if="!file.prepared">
           <p class="md-title"> {{ this.file.msg }}</p>
           <md-progress-bar md-mode="indeterminate"></md-progress-bar>
         </div>
-        <md-button class="md-icon-button md-raised md-primary" @click="playPause">
-          <md-icon>play_arrow</md-icon>
-          <md-tooltip md-direction="top">再生</md-tooltip>
-        </md-button>
-        <md-button class="md-icon-button md-raised" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
-          <md-icon>skip_previous</md-icon>
-          <md-tooltip md-direction="top">先頭に戻る</md-tooltip>
-        </md-button>
-        <md-button class="md-icon-button md-raised" @click="selectStart">
-          <md-icon>first_page</md-icon>
-          <md-tooltip md-direction="top">始点を選択</md-tooltip>
-        </md-button>
-        <md-button class="md-icon-button md-raised" @click="selectEnd">
-          <md-icon>last_page</md-icon>
-          <md-tooltip md-direction="top">終点を選択</md-tooltip>
-        </md-button>
-        <md-button class="md-icon-button md-raised md-accent" @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">
-          <md-icon>vertical_align_bottom</md-icon>
-          <md-tooltip md-direction="top">タイムラインにコピー</md-tooltip>
-        </md-button>
-        <audio :id="audioElmId" :src="file.dataURL"/>
+        <div v-if="file.prepared">
+          <md-button class="md-icon-button md-raised md-primary" @click="playPause">
+            <md-icon v-if="playing">pause</md-icon>
+            <md-icon v-else>play_arrow</md-icon>
+            <md-tooltip md-direction="top">再生</md-tooltip>
+          </md-button>
+          <md-button class="md-icon-button md-raised" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
+            <md-icon>skip_previous</md-icon>
+            <md-tooltip md-direction="top">先頭に戻る</md-tooltip>
+          </md-button>
+          <md-button class="md-icon-button md-raised" @click="selectStart">
+            <md-icon>first_page</md-icon>
+            <md-tooltip md-direction="top">始点を選択</md-tooltip>
+          </md-button>
+          <md-button class="md-icon-button md-raised" @click="selectEnd">
+            <md-icon>last_page</md-icon>
+            <md-tooltip md-direction="top">終点を選択</md-tooltip>
+          </md-button>
+          <md-button class="md-icon-button md-raised md-accent" @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">
+            <md-icon>vertical_align_bottom</md-icon>
+            <md-tooltip md-direction="top">タイムラインにコピー</md-tooltip>
+          </md-button>
+        </div>
+        
     </div>
 </template>
 
@@ -61,15 +70,20 @@ export default {
   data: function() {
     return {
       blocks: [],
+      source: null,
+      startTime: 0,
+      position: 0,
+      displayPosition: "",
       mSource: null,
       audioElm: null,
       playing: false,
       intervalId: 0,
-      position: 0,
       playingBlockIndex: 0,
       selectStartPos: 0,
       selectEndPos: 0,
-      counter: 0
+      counter: 0,
+      metroOn: true,
+      trackOn: true
     };
   },
   methods: {
@@ -93,12 +107,6 @@ export default {
           vue.file.bpmList = res.bpm;
           vue.file.beatLength = 60 / res.bpm[0];
           vue.file.startOffset = res.offset;
-
-          reader2.onload = d => {
-            vue.file.dataURL = d.target.result;
-          };
-
-          reader2.readAsDataURL(vue.file.file);
 
           resolve();
         };
@@ -132,22 +140,32 @@ export default {
         this.counter++;
         time += beatLength;
       }
-      this.audioElm = window.document.getElementById(this.audioElmId);
-      this.audioElm.onended = () => {
-        this.playing = false;
-        this.playingBlockIndex = 0;
-      };
-
       clearInterval(this.intervalId);
       this.intervalId = setInterval(() => {
-        this.position = this.audioElm.currentTime + 0.1;
+        if (!this.playing) return;
+        this.position = this.$store.state.context.currentTime - this.startTime;
         for (let i = this.playingBlockIndex; i < this.blocks.length; i++) {
           if (
             this.blocks[i].startPos < this.position &&
             this.position < this.blocks[i].endPos
           ) {
-            this.playingBlockIndex = i;
-            if (!this.blocks[i].playing) this.metro();
+            if (!this.blocks[i].playing) {
+              if (this.metroOn)
+                this.metro(this.blocks[i + 1].startPos - this.position);
+
+              this.playingBlockIndex = i;
+
+              if (this.trackOn && i - 15 >= 0) {
+                const target = window.document.getElementById(
+                  "original-sound-block-canvas-" +
+                    this.blocks[i - 15].id +
+                    this.file.id
+                );
+                window.document
+                  .getElementById(this.containerId)
+                  .scroll(target.offsetLeft, 0);
+              }
+            }
             this.blocks[i].playing = true;
             break;
           } else {
@@ -155,26 +173,50 @@ export default {
           }
         }
       }, 20);
+      setInterval(() => {
+        this.displayPosition =
+          (this.position / 60 >= 10
+            ? Math.round(this.position / 60)
+            : "0" + Math.round(this.position / 60)) +
+          ":" +
+          (this.position % 60 >= 10
+            ? Math.round(this.position % 60)
+            : "0" + Math.round(this.position % 60));
+      }, 200);
 
       this.file.prepared = true;
     },
     playPause: function() {
       if (this.playing) {
-        this.audioElm.pause();
+        this.source.stop();
         this.playing = false;
       } else {
-        this.audioElm.play();
+        this.source = this.$store.state.context.createBufferSource();
+        this.source.buffer = this.file.buffer;
+        this.source.onended = () => {
+          console.log(this.playingBlockIndex);
+          console.log(this.blocks.length);
+          if (this.playingBlockIndex == this.blocks.length - 2) {
+            this.playing = false;
+            this.position = 0;
+            this.playingBlockIndex = 0;
+          }
+        };
+        this.source.connect(this.$store.state.context.destination);
+        this.source.start(0, this.position);
+        this.startTime = this.$store.state.context.currentTime - this.position;
         this.playing = true;
-        this.metro();
       }
     },
     blockSelect: function(data) {
-      this.audioElm.currentTime = data.startPos;
+      this.playPause();
+      this.position = data.startPos;
       this.playingBlockIndex = data.index;
       this.blocks.forEach(el => {
         el.playing = false;
       });
       this.blocks[data.index].playing = true;
+      this.playPause();
     },
     selectStart: function() {
       this.blocks.forEach(el => {
@@ -188,11 +230,11 @@ export default {
       for (let i = this.selectStartPos; i <= this.selectEndPos; i++)
         this.blocks[i].selecting = true;
     },
-    metro: function() {
+    metro: function(delay) {
       this.mSource = this.$store.state.context.createBufferSource();
       this.mSource.buffer = this.$store.state.mBuffer;
       this.mSource.connect(this.$store.state.context.destination);
-      this.mSource.start(0);
+      this.mSource.start(delay);
     },
     updateStartOffset: function(e) {
       this.file.startOffset = Number(e.target.value);
@@ -200,22 +242,22 @@ export default {
     }
   },
   computed: {
-    audioElmId: function() {
+    containerId: function() {
       return "OriginalTrack" + this.file.id;
     },
-    bpm: function(){
+    bpm: function() {
       return this.file.bpm;
     },
-    startOffset: function(){
+    startOffset: function() {
       return this.file.startOffset;
     }
   },
-  watch:{
-    bpm :function(n,o){
+  watch: {
+    bpm: function(n, o) {
       this.file.beatLength = 60 / n;
       this.init();
     },
-    startOffset: function(n,o){
+    startOffset: function(n, o) {
       this.init();
     }
   },
@@ -233,8 +275,8 @@ export default {
   padding: 5px;
 }
 .inline {
-  display:inline-block;
-  width:initial;
+  display: inline-block;
+  width: initial;
 }
 .flex {
   position: relative;
