@@ -42,6 +42,9 @@ const createStore = () => {
           state.soundBlocks.push(block)
         );
       },
+      removeBlock(state, index) {
+        state.soundBlocks.splice(index, 1);
+      },
       setDevice(state, d) {
         state.device = d;
       },

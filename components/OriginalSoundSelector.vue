@@ -1,6 +1,6 @@
 <template>
     <div class="container md-elevation-2">
-        <div> {{ file.name }}</div>
+        <div> {{ file.name }}: {{ file.bpm }}bpm </div>
         <div v-if="file.prepared" class="flex">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
         </div>

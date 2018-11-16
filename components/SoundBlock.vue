@@ -1,6 +1,9 @@
 <template>
     <div>
-        <div ><md-icon class="handle">drag_indicator</md-icon></div>
+        <div>
+           <md-button class="md-icon-button"><md-icon class="handle">drag_indicator</md-icon></md-button>
+          <md-button class="md-icon-button" @click="remove"><md-icon>restore_from_trash</md-icon></md-button>
+        </div>
         <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing}" @click="play">
         </canvas>
     </div>
@@ -51,6 +54,9 @@ export default {
         ctx.fillRect(counter, (1 - avg) * 50, 1, avg * 100);
         counter++;
       }
+    },
+    remove: function() {
+      this.$store.commit("removeBlock", this.index);
     }
   },
   computed: {
@@ -79,7 +85,7 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  display:inline-block;
+  display: inline-block;
 }
 
 div:hover {
@@ -87,7 +93,7 @@ div:hover {
 }
 
 .handle {
-  cursor:move;
+  cursor: move;
 }
 
 .active {
