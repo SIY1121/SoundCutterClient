@@ -10,7 +10,7 @@
             <md-tooltip md-direction="top">削除</md-tooltip>
           </md-button>
         </div>
-        <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing}" @click="play">
+        <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing}" @click="playWithOffset">
         </canvas>
         <div class="time"> {{ endTime }}</div>
     </div>
@@ -19,23 +19,38 @@
 <script>
 export default {
   name: "SoundBlock",
-  props: ["startPos", "endPos", "index", "id", "file"],
+  props: ["startPos", "endPos", "index", "id", "file", "playerPlaying","playOffset"],
   data: function() {
     return {
-      playing: false
+      playing: false,
+      source: null,
+      timeoutId: 0
     };
   },
   methods: {
-    play: function() {
-      const source = this.$store.state.context.createBufferSource();
-      source.buffer = this.file.buffer;
-      source.onended = () => {
+    play: function(delay) {
+      this.source = this.$store.state.context.createBufferSource();
+      this.source.buffer = this.file.buffer;
+      this.source.onended = () => {
         this.playing = false;
-        this.$store.commit("setPlayBlock", this.index + 1);
+        if(this.$store.state.soundBlocks.length -1 == this.index)
+          this.$emit("end");
       };
-      source.connect(this.$store.state.context.destination);
-      source.start(0, this.startPos, this.endPos - this.startPos);
-      this.playing = true;
+      this.source.connect(this.$store.state.context.destination);
+      this.source.start(
+        this.$store.state.context.currentTime + delay,
+        this.startPos,
+        this.endPos - this.startPos
+      );
+      this.timeoutId = setTimeout(() => (this.playing = true), delay * 1000);
+    },
+    playWithOffset: function(){
+      this.playOffset = this.index;
+      this.playerPlaying = true;
+    },
+    stop: function() {
+      clearTimeout(this.timeoutId);
+      this.source.stop();
     },
     drawWaveform: function() {
       const ctx = window.document
@@ -98,9 +113,18 @@ export default {
     this.drawWaveform();
   },
   watch: {
-    playIndex: function(n, o) {
-      if (this.index == n) {
-        this.play();
+    playerPlaying: function(n, o) {
+      if (n) {
+        let delay = 0;
+        for (let i = this.playOffset; i < this.index; i++) {
+          delay +=
+            this.$store.state.soundBlocks[i].endPos -
+            this.$store.state.soundBlocks[i].startPos;
+        }
+        console.log(delay);
+        this.play(delay);
+      } else {
+        this.stop();
       }
     }
   }

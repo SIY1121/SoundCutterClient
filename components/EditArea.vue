@@ -9,10 +9,10 @@
           <div><md-icon>timeline</md-icon>タイムライン</div>
           <draggable v-model="soundBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false">
             <transition-group name="flip-list" tag="div" class="flex">
-              <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :file="block.file"/>
+              <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :file="block.file" :playerPlaying="playing" :playOffset="playOffset" @end="stop"/>
             </transition-group>
           </draggable>  
-          <md-button class="md-icon-button md-raised md-primary" @click="$store.state.playingBlock = 0">
+          <md-button class="md-icon-button md-raised md-primary" @click="if(!playing)play();else stop();">
             <md-icon v-if="playing">pause</md-icon>
             <md-icon v-else>play_arrow</md-icon>
             <md-tooltip md-direction="top">再生(SPACE)</md-tooltip>
@@ -27,9 +27,23 @@ import draggable from "vuedraggable";
 
 export default {
   name: "EditArea",
+  data: function() {
+    return {
+      playing: false,
+      playOffset:0,
+    };
+  },
   components: {
     SoundBlock,
     draggable
+  },
+  methods: {
+    play: function() {
+      this.playing = true;
+    },
+    stop:function(){
+      this.playing = false;
+    }
   },
   computed: {
     soundBlocks: {
@@ -52,9 +66,9 @@ export default {
   overflow-x: scroll;
 }
 .container {
-  padding:5px;
+  padding: 5px;
 }
 .flip-list-move {
-  transition: transform .3s;
+  transition: transform 0.3s;
 }
 </style>

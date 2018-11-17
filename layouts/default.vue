@@ -2,7 +2,7 @@
   <div>
    <md-app>
       <md-app-toolbar class="md-primary">
-        <span class="md-title" style="flex: 1">SoundCutter</span>
+        <span class="md-title" style="flex: 1"><nuxt-link to="/" style="color:#222222;text-decoration: none;">SoundCutter beta</nuxt-link></span>
         <nuxt-link to="/about"><md-button>About</md-button></nuxt-link>
       </md-app-toolbar>
       <md-app-content style="min-height:100vw">
@@ -40,7 +40,7 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
-  
+
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
