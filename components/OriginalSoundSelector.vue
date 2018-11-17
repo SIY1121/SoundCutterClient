@@ -1,6 +1,7 @@
 <template>
     <div class="container md-elevation-2" tabindex="0" @keydown.prevent.32="playPause" @keydown.prevent.exact.left="playingBlockIndex--;ctrlArrowDown();" @keydown.prevent.exact.right="playingBlockIndex++;ctrlArrowDown();" @keydown.prevent.ctrl.left="selectStart" @keydown.prevent.ctrl.right="selectEnd" @keydown.prevent.ctrl.down="copyToTimeline" @keydown.prevent.ctrl.up="flag">
         <div>
+          <md-icon>music_note</md-icon>
           {{ file.name }}
         </div>
         <div v-if="file.prepared">
@@ -22,7 +23,7 @@
           <div>{{ displayPosition }}</div>
         </div>
         
-        <div v-if="file.prepared" class="flex" :id="containerId">
+        <div v-if="file.prepared" class="flex md-scrollbar" :id="containerId">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
           <flag v-for="(flag,index) in flags" :key="'flag' + flag.block.id" :data="flag" :file="file" :flags="flags" :index="index" style="position:absolute"></flag>
         </div>
@@ -113,7 +114,7 @@ export default {
           vue.file.bpm = res.bpm[0];
           vue.file.bpmList = res.bpm;
           vue.file.beatLength = 60 / res.bpm[0];
-          vue.file.startOffset = res.offset;
+          vue.file.startOffset = res.offset - 0.04;
 
           resolve();
         };
@@ -155,7 +156,7 @@ export default {
         this.position = this.$store.state.context.currentTime - this.startTime;
         for (let i = this.playingBlockIndex; i < this.blocks.length; i++) {
           if (
-            this.blocks[i].startPos < this.position &&
+            this.blocks[i].startPos < this.position + 0.2 &&
             this.position < this.blocks[i].endPos
           ) {
             if (!this.blocks[i].playing) {
@@ -177,13 +178,13 @@ export default {
       }, 20);
       setInterval(() => {
         this.displayPosition =
-          (Math.round(this.position / 60) >= 10
-            ? Math.round(this.position / 60)
-            : "0" + Math.round(this.position / 60)) +
+          (Math.floor(this.position / 60) >= 10
+            ? Math.floor(this.position / 60)
+            : "0" + Math.floor(this.position / 60)) +
           ":" +
-          (Math.round(this.position % 60) >= 10
-            ? Math.round(this.position % 60)
-            : "0" + Math.round(this.position % 60));
+          (Math.floor(this.position % 60) >= 10
+            ? Math.floor(this.position % 60)
+            : "0" + Math.floor(this.position % 60));
       }, 200);
 
       this.file.prepared = true;

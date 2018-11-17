@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="soundBlock">
         <div>
           <md-button class="md-icon-button">
             <md-icon class="handle">drag_indicator</md-icon>
@@ -12,6 +12,7 @@
         </div>
         <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing}" @click="play">
         </canvas>
+        <div class="time"> {{ endTime }}</div>
     </div>
 </template>
 
@@ -74,6 +75,23 @@ export default {
     },
     playIndex: function() {
       return this.$store.state.playingBlock;
+    },
+    endTime: function() {
+      let time = 0;
+      for (let i = 0; i <= this.index; i++) {
+        time +=
+          this.$store.state.soundBlocks[i].endPos -
+          this.$store.state.soundBlocks[i].startPos;
+      }
+      time =
+        (Math.floor(time / 60) >= 10
+          ? Math.floor(time / 60)
+          : "0" + Math.floor(time / 60)) +
+        ":" +
+        (Math.floor(time % 60) >= 10
+          ? Math.floor(time % 60)
+          : "0" + Math.floor(time % 60));
+      return time;
     }
   },
   mounted: function() {
@@ -90,8 +108,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-  display: inline-block;
+.soundBlock {
+  position: relative;
 }
 
 div:hover {
@@ -100,6 +118,12 @@ div:hover {
 
 .handle {
   cursor: move;
+}
+
+.time {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 .active {

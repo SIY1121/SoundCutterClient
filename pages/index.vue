@@ -14,25 +14,7 @@
       </div>
       <md-divider class="divider"></md-divider>
       <edit-area/>
-      <md-button class="md-raised md-accent" @click="save">Save<md-icon>save_alt</md-icon></md-button>
-
-      <md-dialog :md-active.sync="showDialog">
-        <md-dialog-title>処理中です</md-dialog-title>
-        <div class="content">
-          <p>
-            現在書き出し処理中です。  
-          </p>
-        </div>
-        <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-        <md-dialog-actions>
-          <md-button class="md-primary" @click="showDialog = false">Cancel</md-button>
-          <md-button class="md-primary" @click="showDialog = false">Close</md-button>
-        </md-dialog-actions>
-      </md-dialog>
-      <md-snackbar md-position="center" md-duration="5000" :md-active.sync="showSnackbar" md-persistent>
-        <span>出力が完了しました</span>
-        <md-button class="md-primary" @click="showSnackbar = false">OK</md-button>
-      </md-snackbar>
+      <save/>
     </div>
   </section>
 </template>
@@ -43,10 +25,10 @@ import OrigianlSoundSelector from "~/components/OriginalSoundSelector.vue";
 import SoundBlock from "~/components/SoundBlock.vue";
 import FileSelector from "~/components/FileSelector.vue";
 import EditArea from "~/components/EditArea.vue";
+import Save from "~/components/Save.vue"
 import { analyze } from "web-audio-beat-detector";
 import test from "~/assets/bpmAnalyzer.js";
 
-import saveAs from "file-saver";
 
 export default {
   components: {
@@ -54,14 +36,8 @@ export default {
     SoundBlock,
     FileSelector,
     OrigianlSoundSelector,
-    EditArea
-  },
-  data: function() {
-    return {
-      showDialog: false,
-      showSnackbar: false,
-      progress: 0,
-    };
+    EditArea,
+    Save
   },
   mounted: function() {
     this.$store.commit("setDevice", this.detectDevice());
@@ -86,47 +62,7 @@ export default {
         fileId: data.fileId
       });
     },
-    save: function() {
-      this.showDialog = true;
-      const worker = new window.Worker("/worker.js");
-      let index = 0;
-      worker.onmessage = e => {
-        if (e.data[0] == "done") {
-          saveAs(e.data[1], "save.mp3");
-          worker.terminate();
-          this.showDialog = false;
-          this.showSnackbar = true;
-        } else {
-          this.progress = index / this.$store.state.soundBlocks.length * 100;
-          if (index == this.$store.state.soundBlocks.length) {
-            worker.postMessage(["done"]);
-            return;
-          }
-          const b = this.$store.state.soundBlocks[index];
-          const f = this.$store.state.files.find(el => el.id == b.fileId);
-          index++;
-          worker.postMessage([
-            "post",
-            f.buffer
-              .getChannelData(0)
-              .slice(
-                b.startPos * f.buffer.sampleRate,
-                b.endPos * f.buffer.sampleRate
-              ),
-            f.buffer
-              .getChannelData(1)
-              .slice(
-                b.startPos * f.buffer.sampleRate,
-                b.endPos * f.buffer.sampleRate
-              )
-          ]);
-        }
-      };
-      worker.postMessage([
-        "config",
-        this.$store.state.files[0].buffer.sampleRate
-      ]);
-    },
+    
     detectDevice: function() {
       const ua = navigator.userAgent;
       if (

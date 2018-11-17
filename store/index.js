@@ -8,7 +8,7 @@ const createStore = () => {
       files: [],
       soundBlocks: [],
       mBuffer: null,
-      playingBlock: 0,
+      playingBlock: -1,
       blockSpesificId: 0,
       pixelPerSec: 50,
       device: ""

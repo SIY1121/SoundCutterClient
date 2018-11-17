@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="originalSoundBlock">
     <div style="height:20px;"></div>
     <div @click="$emit('select',{startPos:startPos,index: index})">
       <div class="handle"></div>
@@ -58,6 +58,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.originalSoundBlock {
+  overflow: initial;
+}
+
 div:hover {
   background-color: aqua;
 }

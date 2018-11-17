@@ -17,7 +17,7 @@
 // before the code. Then that object will be used in the code, and you
 // can continue to use Module afterwards as well.
 var Module;
-if (!Module) Module = (typeof Module !== 'undefined' ? Module : null) || {TOTAL_MEMORY:250000000};
+if (!Module) Module = (typeof Module !== 'undefined' ? Module : null) || {TOTAL_MEMORY:100000000};
 
 // Sometimes an existing Module object exists with properties
 // meant to overwrite the default module functionality. Here

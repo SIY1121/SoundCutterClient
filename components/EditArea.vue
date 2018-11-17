@@ -12,6 +12,11 @@
               <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :file="block.file"/>
             </transition-group>
           </draggable>  
+          <md-button class="md-icon-button md-raised md-primary" @click="$store.state.playingBlock = 0">
+            <md-icon v-if="playing">pause</md-icon>
+            <md-icon v-else>play_arrow</md-icon>
+            <md-tooltip md-direction="top">再生(SPACE)</md-tooltip>
+          </md-button>
       </div>
     </div>
 </template>

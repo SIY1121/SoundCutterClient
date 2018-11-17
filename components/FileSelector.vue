@@ -1,6 +1,6 @@
 <template>
     <div>
-      <input type="file" id="file" @change="onFileSelect" style="display:none"/>
+      <input type="file" id="file" accept=".wav,.webm,.ogg,.mp3,.flac" @change="onFileSelect" style="display:none"/>
       <md-button class="md-raised md-accent" @click="damyClick">
         ファイルを選択
         <md-icon>add</md-icon>
