@@ -61,6 +61,16 @@ export default {
   width: 100px;
 }
 
+.containerf::before{
+  content: '';
+  display:block;
+  position:absolute;
+  top:32px;
+  height: 100px;
+  width:2px;
+  background-color:orange;
+}
+
 .flag {
   background-color: orange;
   color: white;

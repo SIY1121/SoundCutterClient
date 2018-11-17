@@ -1,5 +1,5 @@
 <template>
-    <div class="container md-elevation-2" tabindex="0" @keydown.prevent.32="playPause" @keydown.prevent.exact.left="playingBlockIndex--;ctrlArrowDown();" @keydown.prevent.exact.right="playingBlockIndex++;ctrlArrowDown();" @keydown.prevent.ctrl.left="selectStart" @keydown.prevent.ctrl.right="selectEnd" @keydown.prevent.ctrl.down="copyToTimeline">
+    <div class="container md-elevation-2" tabindex="0" @keydown.prevent.32="playPause" @keydown.prevent.exact.left="playingBlockIndex--;ctrlArrowDown();" @keydown.prevent.exact.right="playingBlockIndex++;ctrlArrowDown();" @keydown.prevent.ctrl.left="selectStart" @keydown.prevent.ctrl.right="selectEnd" @keydown.prevent.ctrl.down="copyToTimeline" @keydown.prevent.ctrl.up="flag">
         <div>
           {{ file.name }}
         </div>
@@ -34,7 +34,7 @@
           <md-button class="md-icon-button md-raised md-primary" @click="playPause">
             <md-icon v-if="playing">pause</md-icon>
             <md-icon v-else>play_arrow</md-icon>
-            <md-tooltip md-direction="top">再生</md-tooltip>
+            <md-tooltip md-direction="top">再生(SPACE)</md-tooltip>
           </md-button>
           <md-button class="md-icon-button md-raised" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
             <md-icon>skip_previous</md-icon>
@@ -42,19 +42,19 @@
           </md-button>
           <md-button class="md-icon-button md-raised" @click="selectStart">
             <md-icon>first_page</md-icon>
-            <md-tooltip md-direction="top">始点を選択</md-tooltip>
+            <md-tooltip md-direction="top">始点を選択(ctrl+←)</md-tooltip>
           </md-button>
           <md-button class="md-icon-button md-raised" @click="selectEnd">
             <md-icon>last_page</md-icon>
-            <md-tooltip md-direction="top">終点を選択</md-tooltip>
+            <md-tooltip md-direction="top">終点を選択(ctrl+→)</md-tooltip>
           </md-button>
           <md-button class="md-icon-button md-raised md-accent" @click="copyToTimeline">
             <md-icon>vertical_align_bottom</md-icon>
-            <md-tooltip md-direction="top">タイムラインにコピー</md-tooltip>
+            <md-tooltip md-direction="top">タイムラインにコピー(ctrl+↓)</md-tooltip>
           </md-button>
           <md-button class="md-icon-button md-raised md-accent" @click="flag">
             <md-icon>flag</md-icon>
-            <md-tooltip md-direction="top">フラグを立てる</md-tooltip>
+            <md-tooltip md-direction="top">フラグを立てる(ctrl+↑)</md-tooltip>
           </md-button>
         </div>
         
@@ -121,7 +121,7 @@ export default {
       });
     },
     init: function() {
-      this.flags.splice(0, this.flags.length);
+      //this.flags.splice(0, this.flags.length);
 
       this.file.prepared = false;
       this.file.msg = "音声を解析中";
