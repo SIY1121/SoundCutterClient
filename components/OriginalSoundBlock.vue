@@ -1,9 +1,12 @@
 <template>
+  <div>
+    <div style="height:20px;"></div>
     <div @click="$emit('select',{startPos:startPos,index: index})">
-        <div class="handle"></div>
-        <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing,selecting : selecting}">
-        </canvas>
+      <div class="handle"></div>
+      <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing,selecting : selecting}">
+      </canvas>
     </div>
+  </div>
 </template>
 
 <script>

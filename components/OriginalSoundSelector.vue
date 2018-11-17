@@ -1,5 +1,5 @@
 <template>
-    <div class="container md-elevation-2">
+    <div class="container md-elevation-2" tabindex="0" @keydown.prevent.32="playPause" @keydown.prevent.exact.left="playingBlockIndex--;ctrlArrowDown();" @keydown.prevent.exact.right="playingBlockIndex++;ctrlArrowDown();" @keydown.prevent.ctrl.left="selectStart" @keydown.prevent.ctrl.right="selectEnd" @keydown.prevent.ctrl.down="copyToTimeline">
         <div>
           {{ file.name }}
         </div>
@@ -22,9 +22,9 @@
           <div>{{ displayPosition }}</div>
         </div>
         
-        
         <div v-if="file.prepared" class="flex" :id="containerId">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
+          <flag v-for="(flag,index) in flags" :key="'flag' + flag.block.id" :data="flag" :file="file" :flags="flags" :index="index" style="position:absolute"></flag>
         </div>
         <div v-if="!file.prepared">
           <p class="md-title"> {{ this.file.msg }}</p>
@@ -48,9 +48,13 @@
             <md-icon>last_page</md-icon>
             <md-tooltip md-direction="top">終点を選択</md-tooltip>
           </md-button>
-          <md-button class="md-icon-button md-raised md-accent" @click="$emit('select',{fileId: file.id,startPos:blocks[selectStartPos].startPos,endPos:blocks[selectEndPos].endPos})">
+          <md-button class="md-icon-button md-raised md-accent" @click="copyToTimeline">
             <md-icon>vertical_align_bottom</md-icon>
             <md-tooltip md-direction="top">タイムラインにコピー</md-tooltip>
+          </md-button>
+          <md-button class="md-icon-button md-raised md-accent" @click="flag">
+            <md-icon>flag</md-icon>
+            <md-tooltip md-direction="top">フラグを立てる</md-tooltip>
           </md-button>
         </div>
         
@@ -59,17 +63,20 @@
 
 <script>
 import OriginalSoundBlock from "~/components/OriginalSoundBlock.vue";
+import Flag from "~/components/flag.vue";
 import analyze from "~/assets/bpmAnalyzer.js";
 
 export default {
   components: {
-    OriginalSoundBlock
+    OriginalSoundBlock,
+    Flag
   },
   name: "OriginalSoundSelector",
   props: ["file"],
   data: function() {
     return {
       blocks: [],
+      flags: [],
       source: null,
       startTime: 0,
       position: 0,
@@ -114,6 +121,8 @@ export default {
       });
     },
     init: function() {
+      this.flags.splice(0, this.flags.length);
+
       this.file.prepared = false;
       this.file.msg = "音声を解析中";
       this.blocks.splice(0, this.blocks.length);
@@ -156,14 +165,7 @@ export default {
               this.playingBlockIndex = i;
 
               if (this.trackOn && i - 15 >= 0) {
-                const target = window.document.getElementById(
-                  "original-sound-block-canvas-" +
-                    this.blocks[i - 15].id +
-                    this.file.id
-                );
-                window.document
-                  .getElementById(this.containerId)
-                  .scroll(target.offsetLeft, 0);
+                this.scrollToPlayingBlock();
               }
             }
             this.blocks[i].playing = true;
@@ -175,11 +177,11 @@ export default {
       }, 20);
       setInterval(() => {
         this.displayPosition =
-          (this.position / 60 >= 10
+          (Math.round(this.position / 60) >= 10
             ? Math.round(this.position / 60)
             : "0" + Math.round(this.position / 60)) +
           ":" +
-          (this.position % 60 >= 10
+          (Math.round(this.position % 60) >= 10
             ? Math.round(this.position % 60)
             : "0" + Math.round(this.position % 60));
       }, 200);
@@ -209,14 +211,22 @@ export default {
       }
     },
     blockSelect: function(data) {
-      this.playPause();
-      this.position = data.startPos;
-      this.playingBlockIndex = data.index;
+      if (this.playing) this.playPause();
+      this.updatePlayingBlock(data.startPos, data.index);
+    },
+    ctrlArrowDown: function() {
+      if (this.playing) this.playPause();
+      const block = this.blocks[this.playingBlockIndex];
+      this.updatePlayingBlock(block.startPos, this.playingBlockIndex);
+      this.scrollToPlayingBlock();
+    },
+    updatePlayingBlock: function(startPos, index) {
+      this.position = startPos;
+      this.playingBlockIndex = index;
       this.blocks.forEach(el => {
         el.playing = false;
       });
-      this.blocks[data.index].playing = true;
-      this.playPause();
+      this.blocks[index].playing = true;
     },
     selectStart: function() {
       this.blocks.forEach(el => {
@@ -230,11 +240,34 @@ export default {
       for (let i = this.selectStartPos; i <= this.selectEndPos; i++)
         this.blocks[i].selecting = true;
     },
+    copyToTimeline: function() {
+      this.$emit("select", {
+        fileId: this.file.id,
+        startPos: this.blocks[this.selectStartPos].startPos,
+        endPos: this.blocks[this.selectEndPos].endPos
+      });
+    },
+    flag: function() {
+      this.flags.push({
+        block: this.blocks[this.playingBlockIndex],
+        text: "flag"
+      });
+    },
     metro: function(delay) {
       this.mSource = this.$store.state.context.createBufferSource();
       this.mSource.buffer = this.$store.state.mBuffer;
       this.mSource.connect(this.$store.state.context.destination);
       this.mSource.start(delay);
+    },
+    scrollToPlayingBlock: function() {
+      const target = window.document.getElementById(
+        "original-sound-block-canvas-" +
+          this.blocks[this.playingBlockIndex - 15].id +
+          this.file.id
+      );
+      window.document
+        .getElementById(this.containerId)
+        .scroll(target.offsetLeft, 0);
     },
     updateStartOffset: function(e) {
       this.file.startOffset = Number(e.target.value);
@@ -283,6 +316,7 @@ export default {
   display: flex;
   flex-wrap: no-wrap;
   overflow-x: scroll;
+  overflow-y: hidden;
 }
 .fade-enter-active,
 .fade-leave-active {
