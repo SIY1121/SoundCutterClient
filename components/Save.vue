@@ -21,35 +21,48 @@
 
     <md-button class="md-raised md-accent" @click="save" :disabled="$store.state.soundBlocks.length == 0">Save<md-icon>save_alt</md-icon></md-button>
 
-    <md-dialog :md-active.sync="showDialog" :md-click-outside-to-close="click_outside_to_close">
-      <md-dialog-title>処理中です</md-dialog-title>
-      <div class="content">
-        <p>
-          現在書き出し処理中です。  
-        </p>
+    <md-dialog :md-active.sync="showDialog" :md-click-outside-to-close="click_outside_to_close" style="padding:10px">
+      <div v-if="!done">
+        <md-dialog-title>処理中です</md-dialog-title>
+        <div class="content">
+          <p>
+            現在書き出し処理中です。  
+          </p>
+        </div>
+        <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
+        <md-dialog-actions>
+          <md-button class="md-accent" @click="cancel">Cancel</md-button>
+        </md-dialog-actions>
       </div>
-      <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
-      <md-dialog-actions>
-        <md-button class="md-accent" @click="cancel">Cancel</md-button>
-      </md-dialog-actions>
+      <div v-else>
+        <md-dialog-title>出力が完了しました</md-dialog-title>
+        <md-dialog-actions>
+          <md-button class="md-accent" @click="showDialog = false">OK</md-button>
+        </md-dialog-actions>
+      </div>
     </md-dialog>
     <md-snackbar md-position="center" md-duration="5000" :md-active.sync="showSnackbar" md-persistent>
       <span>出力が完了しました</span>
-    <md-button class="md-primary" @click="showSnackbar = false">OK</md-button>
+      <md-button class="md-primary" @click="showSnackbar = false">OK</md-button>
     </md-snackbar>
   </div>
 </template>
 
 <script>
 import saveAs from "file-saver";
+import Share from '~/components/Share.vue'
 
 export default {
   name: "Save",
+  components:{
+    Share
+  },
   data: function() {
     return {
       showDialog: false,
       click_outside_to_close: false,
       showSnackbar: false,
+      done : false,
       progress: 0,
       bitrate: "192",
       saveFileName: "save",
@@ -59,7 +72,7 @@ export default {
   methods: {
     save: function() {
       this.$ga.event("Save", "Save", this.bitrate);
-
+      this.done = false;
       this.showDialog = true;
       this.worker = new window.Worker("/worker.js");
       let index = 0;
@@ -68,6 +81,7 @@ export default {
           saveAs(e.data[1], "save.mp3");
           this.worker.terminate();
           this.showDialog = false;
+          this.done = true;
           this.showSnackbar = true;
         } else {
           this.progress = (index / this.$store.state.soundBlocks.length) * 100;

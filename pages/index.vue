@@ -6,6 +6,7 @@
       md-label="プロジェクトが空です"
       md-description="楽曲を追加しましょう">
       <file-selector/>
+      <nuxt-link to="/about" style="margin-top : 10px">使い方を見る</nuxt-link>
     </md-empty-state>
     <div v-else>
       <file-selector/>

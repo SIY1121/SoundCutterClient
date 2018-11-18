@@ -1,21 +1,28 @@
 <template>
-  <div style="min-height:100%">
-   <md-app>
+  <div style="min-height:100vh;">
+   <md-app style="min-height:100vh;">
       <md-app-toolbar class="md-primary">
         <span class="md-title" style="flex: 1"><nuxt-link to="/" style="color:#222222;text-decoration: none;">SoundCutter beta</nuxt-link></span>
         <nuxt-link to="/"><md-button>トップ</md-button></nuxt-link>
         <nuxt-link to="/about"><md-button>アプリについて</md-button></nuxt-link>
       </md-app-toolbar>
       <md-app-content>
-        <nuxt style="min-height:100vh"/>
+        <nuxt style="margin-bottom:30px"/>
+        <footer>
+          <share/>
+        </footer>
       </md-app-content>
-      </md-app>
+    </md-app>
   </div>
 </template>
 
 <script>
-export default{
+import Share from '~/components/Share.vue';
 
+export default{
+  components:{
+    Share
+  }
 }
 </script>
 
@@ -54,33 +61,14 @@ html, body {
   box-sizing: border-box;
   margin: 0;
 }
-
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
+.md-app-container{
+  overflow: hidden;
+}
+footer {
+  position: absolute;;
+  bottom : 0;
+  left: 0;
+  width:100%;
 }
 
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
-
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
-}
-
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
-}
 </style>

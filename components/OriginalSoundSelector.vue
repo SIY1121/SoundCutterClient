@@ -23,7 +23,7 @@
           <div>{{ displayPosition }}</div>
         </div>
         
-        <div v-if="file.prepared" class="flex md-scrollbar" :id="containerId">
+        <div v-if="file.prepared" class="flex" :id="containerId">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
           <flag v-for="(flag,index) in flags" :key="'flag' + flag.block.id" :data="flag" :file="file" :flags="flags" :index="index" style="position:absolute"></flag>
         </div>

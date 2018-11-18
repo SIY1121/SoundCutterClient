@@ -7,7 +7,7 @@ module.exports = {
    ** Headers of the page
    */
   head: {
-    title: "SoundCutter",
+    title: "SoundCutter beta",
     meta: [{
         charset: 'utf-8'
       },
