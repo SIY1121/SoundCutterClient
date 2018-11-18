@@ -29,6 +29,12 @@
       このアプリの改善に協力していただける方は<a href="https://twitter.com/SIY1121">@SIY1121</a>に連絡していただくか<br>
       <a href="https://docs.google.com/forms/d/1CZxoiZkuRevVNAVaJtNkZksNblSWQ_39HFmRBlQyMS4">こちらのフォーム</a>より、ご連絡ください。
     </p>
+    <h1>その他</h1>
+    <p>
+      このアプリは、Nuxt.jsとWeb Audio APIで作成されています。<br>
+      今年のアドベントカレンダーでこのアプリについて書く予定です。<br>
+      <a href="https://qiita.com/siy1121">siy1121 - qiita</a>
+    </p>
   </div>
 </template>
 

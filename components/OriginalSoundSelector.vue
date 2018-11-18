@@ -18,6 +18,7 @@
             <label>開始位置</label>
             <md-input v-model.number="file.startOffset" @input="analyticsStartOffsetChanged"></md-input>
           </md-field>
+          s
           <md-switch v-model="metroOn" @change="analyticsMetroSwitch">メトロノーム</md-switch>
           <md-switch v-model="trackOn" @change="analyticsFollowSwitch">追従</md-switch>
           <div>{{ displayPosition }}</div>
@@ -37,7 +38,7 @@
             <md-icon v-else>play_arrow</md-icon>
             <md-tooltip md-direction="top">再生(SPACE)</md-tooltip>
           </md-button>
-          <md-button class="md-icon-button md-raised" @click="audioElm.currentTime = 0;playingBlockIndex = 0">
+          <md-button class="md-icon-button md-raised" @click="toStart">
             <md-icon>skip_previous</md-icon>
             <md-tooltip md-direction="top">先頭に戻る</md-tooltip>
           </md-button>
@@ -109,7 +110,7 @@ export default {
 
           this.file.msg = "テンポを検出中";
 
-          vue.file.rawBuffer = buf.getChannelData(0);
+          //vue.file.rawBuffer = buf.getChannelData(0);
           const res = await analyze(buf);
           vue.file.bpm = res.bpm[0];
           vue.file.bpmList = res.bpm;
@@ -197,12 +198,10 @@ export default {
         this.source = this.$store.state.context.createBufferSource();
         this.source.buffer = this.file.buffer;
         this.source.onended = () => {
-          console.log(this.playingBlockIndex);
-          console.log(this.blocks.length);
           if (this.playingBlockIndex == this.blocks.length - 2) {
             this.playing = false;
-            this.position = 0;
-            this.playingBlockIndex = 0;
+            this.updatePlayingBlock(0, 0);
+            this.scrollToPlayingBlock();
           }
         };
         this.source.connect(this.$store.state.context.destination);
@@ -210,6 +209,11 @@ export default {
         this.startTime = this.$store.state.context.currentTime - this.position;
         this.playing = true;
       }
+    },
+    toStart: function() {
+      if (this.playing) this.playPause();
+      this.updatePlayingBlock(0, 0);
+      this.scrollToPlayingBlock();
     },
     blockSelect: function(data) {
       if (this.playing) this.playPause();
@@ -263,7 +267,7 @@ export default {
     scrollToPlayingBlock: function() {
       const target = window.document.getElementById(
         "original-sound-block-canvas-" +
-          this.blocks[this.playingBlockIndex - 15].id +
+          this.blocks[this.playingBlockIndex - 10].id +
           this.file.id
       );
       window.document

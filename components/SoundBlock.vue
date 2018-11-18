@@ -9,6 +9,7 @@
             <md-icon>restore_from_trash</md-icon>
             <md-tooltip md-direction="top">削除</md-tooltip>
           </md-button>
+          <div>{{ file.name }}</div>
         </div>
         <canvas :id="canvasId" :width="canvasWidth" height="100px" :class="{active : playing}" @click="playWithOffset">
         </canvas>
@@ -65,7 +66,7 @@ export default {
       const oneBarSampleCount = Math.round(
         needSampleCount / (pixelPerSec * (this.endPos - this.startPos))
       );
-      const rawSample = this.file.rawBuffer;
+      const rawSample = this.file.buffer.getChannelData(0);
       let counter = 0;
       for (let i = startSamplePos; i < endSamplePos; i += oneBarSampleCount) {
         let avg = 0;

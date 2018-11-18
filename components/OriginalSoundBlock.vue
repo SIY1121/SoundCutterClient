@@ -30,7 +30,7 @@ export default {
       const oneBarSampleCount = Math.round(
         needSampleCount / (pixelPerSec * (this.endPos - this.startPos))
       );
-      const rawSample = this.file.rawBuffer;
+      const rawSample = this.file.buffer.getChannelData(0);
       let counter = 0;
       for (let i = startSamplePos; i < endSamplePos; i += oneBarSampleCount) {
         let avg = 0;
