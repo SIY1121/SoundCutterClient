@@ -42,18 +42,24 @@
             <md-icon>skip_previous</md-icon>
             <md-tooltip md-direction="top">先頭に戻る</md-tooltip>
           </md-button>
+
+          <div class="divider"></div>
+
           <md-button class="md-icon-button md-raised" @click="selectStart">
-            <md-icon>first_page</md-icon>
+            <img src="/bracket-left.svg"/>
             <md-tooltip md-direction="top">始点を選択(ctrl+←)</md-tooltip>
           </md-button>
           <md-button class="md-icon-button md-raised" @click="selectEnd">
-            <md-icon>last_page</md-icon>
+            <img src="/bracket-right.svg"/>
             <md-tooltip md-direction="top">終点を選択(ctrl+→)</md-tooltip>
           </md-button>
           <md-button class="md-icon-button md-raised md-accent" @click="copyToTimeline">
             <md-icon>vertical_align_bottom</md-icon>
             <md-tooltip md-direction="top">タイムラインにコピー(ctrl+↓)</md-tooltip>
           </md-button>
+
+          <div class="divider"></div>
+
           <md-button class="md-icon-button md-raised md-accent" @click="flag">
             <md-icon>flag</md-icon>
             <md-tooltip md-direction="top">フラグを立てる(ctrl+↑)</md-tooltip>
@@ -340,6 +346,14 @@ export default {
   overflow-x: scroll;
   overflow-y: hidden;
 }
+.divider {
+  margin-top: 10px;
+  border-left:1px #aaaaaa solid;
+  height: 20px;
+  width:2px;
+  display:inline-block;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
