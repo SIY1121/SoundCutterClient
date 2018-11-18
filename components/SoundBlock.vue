@@ -20,7 +20,15 @@
 <script>
 export default {
   name: "SoundBlock",
-  props: ["startPos", "endPos", "index", "id", "file", "playerPlaying","playOffset"],
+  props: [
+    "startPos",
+    "endPos",
+    "index",
+    "id",
+    "file",
+    "playerPlaying",
+    "playOffset"
+  ],
   data: function() {
     return {
       playing: false,
@@ -34,7 +42,7 @@ export default {
       this.source.buffer = this.file.buffer;
       this.source.onended = () => {
         this.playing = false;
-        if(this.$store.state.soundBlocks.length -1 == this.index)
+        if (this.$store.state.soundBlocks.length - 1 == this.index)
           this.$emit("end");
       };
       this.source.connect(this.$store.state.context.destination);
@@ -45,9 +53,8 @@ export default {
       );
       this.timeoutId = setTimeout(() => (this.playing = true), delay * 1000);
     },
-    playWithOffset: function(){
-      this.playOffset = this.index;
-      this.playerPlaying = true;
+    playWithOffset: function() {
+      if (!this.playerPlaying) this.$emit("play", this.index);
     },
     stop: function() {
       clearTimeout(this.timeoutId);
@@ -115,6 +122,7 @@ export default {
   },
   watch: {
     playerPlaying: function(n, o) {
+      if (this.index < this.playOffset) return;
       if (n) {
         let delay = 0;
         for (let i = this.playOffset; i < this.index; i++) {
