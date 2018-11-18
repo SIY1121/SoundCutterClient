@@ -1,12 +1,13 @@
 <template>
-  <div>
+  <div style="min-height:100%">
    <md-app>
       <md-app-toolbar class="md-primary">
         <span class="md-title" style="flex: 1"><nuxt-link to="/" style="color:#222222;text-decoration: none;">SoundCutter beta</nuxt-link></span>
-        <nuxt-link to="/about"><md-button>About</md-button></nuxt-link>
+        <nuxt-link to="/"><md-button>トップ</md-button></nuxt-link>
+        <nuxt-link to="/about"><md-button>アプリについて</md-button></nuxt-link>
       </md-app-toolbar>
-      <md-app-content style="min-height:100vw">
-        <nuxt/>
+      <md-app-content>
+        <nuxt style="min-height:100vh"/>
       </md-app-content>
       </md-app>
   </div>
@@ -30,7 +31,7 @@ export default{
 @import "~vue-material/dist/theme/all"; // Apply the theme
 
 
-html {
+html, body {
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;

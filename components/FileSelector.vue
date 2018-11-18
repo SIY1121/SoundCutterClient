@@ -12,10 +12,17 @@
 export default {
   name: "FileSelector",
   methods: {
-    damyClick:function(){
-      window.document.querySelector('#file').click()
+    damyClick: function() {
+      window.document.querySelector("#file").click();
     },
     onFileSelect: function(e) {
+      this.$ga.event(
+        "Edit",
+        "AddFile",
+        "",
+        this.$store.state.files.length
+      );
+
       const f = e.target.files[0];
 
       const file = {

@@ -7,7 +7,7 @@ module.exports = {
    ** Headers of the page
    */
   head: {
-    title: pkg.name,
+    title: "SoundCutter",
     meta: [{
         charset: 'utf-8'
       },
@@ -19,6 +19,30 @@ module.exports = {
         hid: 'description',
         name: 'description',
         content: pkg.description
+      },
+      {
+        property : 'og:title',
+        content: 'SoundCutter'
+      },
+      {
+        property : 'og:type',
+        content: 'website'
+      },
+      {
+        property : 'og:description',
+        content : 'Web上で音楽が編集できるアプリ'
+      },
+      {
+        property : 'og:url',
+        content : 'https://soundcutter-9d3ca.firebaseapp.com/'
+      },
+      {
+        property : 'og:site_name',
+        content : 'SoundCutter'
+      },
+      {
+        property : 'og:image',
+        content : 'https://soundcutter-9d3ca.firebaseapp.com/icon.png'
       }
     ],
     link: [{
@@ -50,7 +74,7 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    '~/plugins/vue-worker'
+    '~/plugins/vue-worker',
   ],
 
   /*
@@ -64,7 +88,10 @@ module.exports = {
     ['nuxt-vue-material', {
       theme: null,
     }],
-    '@nuxtjs/pwa'
+    '@nuxtjs/pwa',
+    ['@nuxtjs/google-analytics', {
+      id: 'UA-129377569-1'
+    }]
   ],
   /*
    ** Axios module configuration
@@ -81,6 +108,7 @@ module.exports = {
   workbox: {
     offlineAssets:["/m.ogg","/Mp3LameEncoder.js","/worker.js"]
   },
+
   /*
    ** Build configuration
    */

@@ -8,7 +8,7 @@
             <div class="md-layout-item inline">
             <md-field>
               <label for="bpm">BPM</label>
-              <md-select v-model.number="file.bpm" name="bpm" id="bpm" md-dense>
+              <md-select v-model.number="file.bpm" name="bpm" id="bpm" md-dense @md-selected="analyticsBpmSelected">
                 <md-option disabled>候補</md-option>
                 <md-option v-for="item in file.bpmList" :key="item" :value="item"> {{ item }} </md-option>
               </md-select>
@@ -16,10 +16,10 @@
           </div>
           <md-field class="inline">
             <label>開始位置</label>
-            <md-input v-model.number="file.startOffset"></md-input>
+            <md-input v-model.number="file.startOffset" @input="analyticsStartOffsetChanged"></md-input>
           </md-field>
-          <md-switch v-model="metroOn">メトロノーム</md-switch>
-          <md-switch v-model="trackOn">追従</md-switch>
+          <md-switch v-model="metroOn" @change="analyticsMetroSwitch">メトロノーム</md-switch>
+          <md-switch v-model="trackOn" @change="analyticsFollowSwitch">追従</md-switch>
           <div>{{ displayPosition }}</div>
         </div>
         
@@ -273,6 +273,23 @@ export default {
     updateStartOffset: function(e) {
       this.file.startOffset = Number(e.target.value);
       this.init();
+    },
+    analyticsBpmSelected: function() {
+      this.$ga.event(
+        "Edit",
+        "ChangeBPM",
+        this.bpm,
+        this.file.bpmList.indexOf(this.bpm)
+      );
+    },
+    analyticsStartOffsetChanged: function() {
+      this.$ga.event("Edit", "ChangeStartOffset", "", this.file.startOffset);
+    },
+    analyticsMetroSwitch: function() {
+      this.$ga.event("Edit", "MetroSwitch", this.metroOn);
+    },
+    analyticsFollowSwitch: function() {
+      this.$ga.event("Edit", "FollowSwitch", this.trackOn);
     }
   },
   computed: {

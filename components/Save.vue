@@ -58,6 +58,8 @@ export default {
   },
   methods: {
     save: function() {
+      this.$ga.event("Save", "Save", this.bitrate);
+
       this.showDialog = true;
       this.worker = new window.Worker("/worker.js");
       let index = 0;
