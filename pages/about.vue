@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>SoundCutterとは？</h1>
+    <h1>SoundCutterとは...？</h1>
     <p>
       Webブラウザ上で動作する音楽編集アプリです。PC、スマートフォンで利用できます。<br>
       また、PWA(Progressive Web Apps)に対応しているため、一度アクセスすれば、オフラインでも動作します。<br>
