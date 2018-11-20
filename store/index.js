@@ -34,6 +34,7 @@ const createStore = () => {
         state.blockSpesificId++;
         block.id = state.blockSpesificId;
         block.file = state.files.find(el => el.id === block.fileId);
+        block.fadeOption = { inDuration: 0, outDuration: 0 };
         state.soundBlocks.push(block);
       },
       setAllBlock(state, blocks) {

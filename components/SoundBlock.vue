@@ -23,6 +23,10 @@ export default {
   props: [
     "startPos",
     "endPos",
+<<<<<<< Updated upstream
+=======
+    "fadeOption",
+>>>>>>> Stashed changes
     "index",
     "id",
     "file",
@@ -38,16 +42,38 @@ export default {
   },
   methods: {
     play: function(delay) {
+      const currTime = this.$store.state.context.currentTime;
+
       this.source = this.$store.state.context.createBufferSource();
+      const gainNode = this.$store.state.context.createGain();
       this.source.buffer = this.file.buffer;
       this.source.onended = () => {
         this.playing = false;
         if (this.$store.state.soundBlocks.length - 1 == this.index)
           this.$emit("end");
       };
-      this.source.connect(this.$store.state.context.destination);
+      this.source.connect(gainNode);
+      gainNode.connect(this.$store.state.context.destination);
+      gainNode.gain.linearRampToValueAtTime(0, currTime + delay);
+      gainNode.gain.linearRampToValueAtTime(
+        1,
+        currTime + delay + this.fadeOption.inDuration
+      );
+      gainNode.gain.linearRampToValueAtTime(
+        1,
+        currTime +
+          delay +
+          (this.endPos - this.startPos)
+      );
+      gainNode.gain.linearRampToValueAtTime(
+        0,
+        currTime +
+          delay +
+          (this.endPos - this.startPos) +
+          this.fadeOption.outDuration
+      );
       this.source.start(
-        this.$store.state.context.currentTime + delay,
+        currTime + delay,
         this.startPos,
         this.endPos - this.startPos
       );
