@@ -7,17 +7,11 @@
         </md-empty-state>
         <div v-else>
           <div><md-icon>timeline</md-icon>タイムライン</div>
-<<<<<<< Updated upstream
           <div>{{ displayPosition }}</div>
           <draggable v-model="soundBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false" style="position:relative;">
             <transition-group name="flip-list" tag="div" class="flex" style="overflow-y:hidden">
               <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :file="block.file" :playerPlaying="playing" :playOffset="playOffset" @play="play" @end="stop"/>
               <div :key="'caret'" class="caret" :style="caretPosition"></div>
-=======
-          <draggable v-model="soundBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false">
-            <transition-group name="flip-list" tag="div" class="flex">
-              <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :file="block.file" :fadeOption="block.fadeOption" :playerPlaying="playing" :playOffset="playOffset" @end="stop"/>
->>>>>>> Stashed changes
             </transition-group>
           </draggable>
           
