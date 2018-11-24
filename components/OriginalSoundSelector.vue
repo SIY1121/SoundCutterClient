@@ -121,7 +121,7 @@ export default {
           vue.file.bpm = res.bpm[0];
           vue.file.bpmList = res.bpm;
           vue.file.beatLength = 60 / res.bpm[0];
-          vue.file.startOffset = res.offset - 0.04;
+          vue.file.startOffset = Math.round((res.offset - 0.04) * 1000) / 1000;
 
           resolve();
         };
@@ -348,10 +348,10 @@ export default {
 }
 .divider {
   margin-top: 10px;
-  border-left:1px #aaaaaa solid;
+  border-left: 1px #aaaaaa solid;
   height: 20px;
-  width:2px;
-  display:inline-block;
+  width: 2px;
+  display: inline-block;
 }
 
 .fade-enter-active,

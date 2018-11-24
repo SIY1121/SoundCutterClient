@@ -23,10 +23,7 @@ export default {
   props: [
     "startPos",
     "endPos",
-<<<<<<< Updated upstream
-=======
     "fadeOption",
->>>>>>> Stashed changes
     "index",
     "id",
     "file",
@@ -54,24 +51,27 @@ export default {
       };
       this.source.connect(gainNode);
       gainNode.connect(this.$store.state.context.destination);
-      gainNode.gain.linearRampToValueAtTime(0, currTime + delay);
-      gainNode.gain.linearRampToValueAtTime(
-        1,
-        currTime + delay + this.fadeOption.inDuration
-      );
-      gainNode.gain.linearRampToValueAtTime(
-        1,
-        currTime +
-          delay +
-          (this.endPos - this.startPos)
-      );
-      gainNode.gain.linearRampToValueAtTime(
-        0,
-        currTime +
-          delay +
-          (this.endPos - this.startPos) +
-          this.fadeOption.outDuration
-      );
+      if (this.fadeOption.inDuration > 0) {
+        gainNode.gain.linearRampToValueAtTime(0, currTime + delay);
+        gainNode.gain.linearRampToValueAtTime(
+          1,
+          currTime + delay + this.fadeOption.inDuration
+        );
+      }
+      if (this.fadeOption.outDuration > 0) {
+        gainNode.gain.linearRampToValueAtTime(
+          1,
+          currTime + delay + (this.endPos - this.startPos)
+        );
+        gainNode.gain.linearRampToValueAtTime(
+          0,
+          currTime +
+            delay +
+            (this.endPos - this.startPos) +
+            this.fadeOption.outDuration
+        );
+      }
+
       this.source.start(
         currTime + delay,
         this.startPos,

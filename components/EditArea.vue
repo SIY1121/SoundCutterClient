@@ -10,7 +10,7 @@
           <div>{{ displayPosition }}</div>
           <draggable v-model="soundBlocks" :options="{handle:'.handle', clone : true}" @start="drag=true" @end="drag=false" style="position:relative;">
             <transition-group name="flip-list" tag="div" class="flex" style="overflow-y:hidden">
-              <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :file="block.file" :playerPlaying="playing" :playOffset="playOffset" @play="play" @end="stop"/>
+              <sound-block v-for="(block,index) in soundBlocks" v-bind:key="block.id" :startPos="block.startPos" :endPos="block.endPos" :fadeOption="block.fadeOption" :index="index" :id="block.id" :file="block.file" :playerPlaying="playing" :playOffset="playOffset" @play="play" @end="stop"/>
               <div :key="'caret'" class="caret" :style="caretPosition"></div>
             </transition-group>
           </draggable>
