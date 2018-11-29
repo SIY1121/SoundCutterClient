@@ -1,5 +1,5 @@
 <template>
-    <div class="container md-elevation-2" tabindex="0" @keydown.prevent.32="playPause" @keydown.prevent.exact.left="playingBlockIndex--;ctrlArrowDown();" @keydown.prevent.exact.right="playingBlockIndex++;ctrlArrowDown();" @keydown.prevent.ctrl.left="selectStart" @keydown.prevent.ctrl.right="selectEnd" @keydown.prevent.ctrl.down="copyToTimeline" @keydown.prevent.ctrl.up="flag">
+    <div class="container md-elevation-2" :id="containerId" tabindex="0" @keydown.prevent.32="playPause" @keydown.prevent.exact.left="playingBlockIndex--;ctrlArrowDown();" @keydown.prevent.exact.right="playingBlockIndex++;ctrlArrowDown();" @keydown.prevent.ctrl.left="selectStart" @keydown.prevent.ctrl.right="selectEnd" @keydown.prevent.ctrl.down="copyToTimeline" @keydown.prevent.ctrl.up="flag">
         <div>
           <md-icon>music_note</md-icon>
           {{ file.name }}
@@ -24,9 +24,9 @@
           <div>{{ displayPosition }}</div>
         </div>
         
-        <div v-if="file.prepared" class="flex" :id="containerId">
+        <div v-if="file.prepared" class="flex" :id="blockContainerId">
           <original-sound-block v-for="(block,index) in blocks" v-bind:key="block.id" :file="file" :startPos="block.startPos" :endPos="block.endPos" :index="index" :id="block.id" :playing="block.playing" :selecting="block.selecting" @select="blockSelect"/>
-          <flag v-for="(flag,index) in flags" :key="'flag' + flag.block.id" :data="flag" :file="file" :flags="flags" :index="index" style="position:absolute"></flag>
+          <flag v-for="(flag,index) in flags" :key="'flag' + flag.block.id" :data="flag" :file="file" :flags="flags" :index="index" :containerId="containerId" style="position:absolute"></flag>
         </div>
         <div v-if="!file.prepared">
           <p class="md-title"> {{ this.file.msg }}</p>
@@ -277,7 +277,7 @@ export default {
           this.file.id
       );
       window.document
-        .getElementById(this.containerId)
+        .getElementById(this.blockContainerId)
         .scroll(target.offsetLeft, 0);
     },
     updateStartOffset: function(e) {
@@ -303,7 +303,10 @@ export default {
     }
   },
   computed: {
-    containerId: function() {
+    blockContainerId: function() {
+      return "OriginalTrack-Block-Container" + this.file.id;
+    },
+    containerId: function(){
       return "OriginalTrack" + this.file.id;
     },
     bpm: function() {

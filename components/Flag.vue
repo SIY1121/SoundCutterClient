@@ -18,11 +18,14 @@
 <script>
 export default {
   name: "Flag",
-  props: ["data", "index", "file", "flags"],
+  props: ["data", "index", "file", "flags", "containerId"],
   data: function() {
     return {
       focus: false
     };
+  },
+  mounted(){
+    this.focus = true;
   },
   methods: {
     remove: function() {
@@ -47,7 +50,8 @@ export default {
     focus: function(n, o) {
       if(n){
         setTimeout(()=>window.document.getElementById(this.inputId).select(),20);
-        
+      }else{ 
+         setTimeout(()=>window.document.getElementById(this.containerId).focus(),20);
       }
     }
   }
