@@ -71,7 +71,7 @@ canvas {
 }
 
 .active {
-  background-color: yellow;
+  background-color: yellow!important;
 }
 .selecting {
   background-color: blue;
