@@ -2,8 +2,8 @@
   <div style="min-height:100vh;">
    <md-app style="min-height:100vh;">
       <md-app-toolbar class="md-primary">
-        <img src="/kIco.png" alt="" width="45px">
-        <span class="md-title" style="flex: 1"><nuxt-link to="/" style="color:#222222;text-decoration: none;">SoundCutter beta</nuxt-link></span>
+        <img src="/icon.png" alt="" width="45px">
+        <span class="md-title" style="flex: 1"><nuxt-link to="/" style="color:#222222;text-decoration: none;">MusicCutter beta</nuxt-link></span>
         <nuxt-link to="/"><md-button>トップ</md-button></nuxt-link>
         <nuxt-link to="/about"><md-button>アプリについて</md-button></nuxt-link>
       </md-app-toolbar>

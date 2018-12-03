@@ -12,8 +12,8 @@
         <md-icon>keyboard_arrow_down</md-icon>
         </div>
         <a href="http://b.hatena.ne.jp/entry/" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" data-hatena-bookmark-lang="ja" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only@2x.png" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="https://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
-        <div class="fb-share-button" data-href="https://soundcutter-9d3ca.firebaseapp.com/" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">シェア</a></div>
-        <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://soundcutter-9d3ca.firebaseapp.com/">Tweet</a>
+        <div class="fb-share-button" data-href="https://music-cutter-siy.firebaseapp.com/" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">シェア</a></div>
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://music-cutter-siy.firebaseapp.com/">Tweet</a>
       </div>
     </div>
   </div>

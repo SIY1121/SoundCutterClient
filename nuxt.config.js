@@ -7,7 +7,7 @@ module.exports = {
    ** Headers of the page
    */
   head: {
-    title: "SoundCutter beta",
+    title: "MusicCutter beta",
     meta: [{
         charset: 'utf-8'
       },
@@ -22,7 +22,7 @@ module.exports = {
       },
       {
         property : 'og:title',
-        content: 'SoundCutter'
+        content: 'MusicCutter'
       },
       {
         property : 'og:type',
@@ -34,15 +34,15 @@ module.exports = {
       },
       {
         property : 'og:url',
-        content : 'https://soundcutter-9d3ca.firebaseapp.com/'
+        content : 'https://music-cutter-siy.firebaseapp.com/'
       },
       {
         property : 'og:site_name',
-        content : 'SoundCutter'
+        content : 'MusicCutter'
       },
       {
         property : 'og:image',
-        content : 'https://soundcutter-9d3ca.firebaseapp.com/icon.png'
+        content : 'https://music-cutter-siy.firebaseapp.com/icon.png'
       }
     ],
     link: [{
@@ -90,7 +90,7 @@ module.exports = {
     }],
     '@nuxtjs/pwa',
     ['@nuxtjs/google-analytics', {
-      id: 'UA-129377569-1'
+      id: 'UA-130247603-1'
     }]
   ],
   /*
@@ -101,7 +101,7 @@ module.exports = {
   },
 
   manifest: {
-    name: "SoundCutter",
+    name: "MusicCutter",
     lang: 'ja'
   },
 
