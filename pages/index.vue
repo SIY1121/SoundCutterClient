@@ -27,7 +27,6 @@ import SoundBlock from "~/components/SoundBlock.vue";
 import FileSelector from "~/components/FileSelector.vue";
 import EditArea from "~/components/EditArea.vue";
 import Save from "~/components/Save.vue"
-import { analyze } from "web-audio-beat-detector";
 import test from "~/assets/bpmAnalyzer.js";
 
 

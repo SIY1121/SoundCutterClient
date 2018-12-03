@@ -17,7 +17,7 @@
 // before the code. Then that object will be used in the code, and you
 // can continue to use Module afterwards as well.
 var Module;
-if (!Module) Module = (typeof Module !== 'undefined' ? Module : null) || {TOTAL_MEMORY:50000000};
+if (!Module) Module = (typeof Module !== 'undefined' ? Module : null) || {};
 
 // Sometimes an existing Module object exists with properties
 // meant to overwrite the default module functionality. Here
@@ -1193,6 +1193,7 @@ var DYNAMIC_BASE = 0, DYNAMICTOP = 0; // dynamic area handled by sbrk
 
 function enlargeMemory() {
   abort('Cannot enlarge memory arrays. Either (1) compile with -s TOTAL_MEMORY=X with X higher than the current value ' + TOTAL_MEMORY + ', (2) compile with ALLOW_MEMORY_GROWTH which adjusts the size at runtime but prevents some optimizations, or (3) set Module.TOTAL_MEMORY before the program runs.');
+  
 }
 
 

@@ -1,35 +1,41 @@
 <template>
   <div class="save md-elevation-2">
-
     <md-field class="inline">
       <label>保存名</label>
       <md-input v-model="saveFileName"></md-input>
     </md-field>
+
     .mp3
-
     <div class="inline md-layout-item">
-        <md-field>
-          <label for="bitrate">ビットレート</label>
-          <md-select v-model="bitrate" name="bitrate" id="bitrate" md-dense>
-            <md-option value="128">128 kbps</md-option>
-            <md-option value="192">192 kbps</md-option>
-            <md-option value="256">256 kbps</md-option>
-            <md-option value="320">320 kbps</md-option>
-          </md-select>
-        </md-field>
-      </div>
+      <md-field>
+        <label for="bitrate">ビットレート</label>
+        <md-select v-model="bitrate" name="bitrate" id="bitrate" md-dense>
+          <md-option value="128">128 kbps</md-option>
+          <md-option value="192">192 kbps</md-option>
+          <md-option value="256">256 kbps</md-option>
+          <md-option value="320">320 kbps</md-option>
+        </md-select>
+      </md-field>
+    </div>
 
-    <md-button class="md-raised md-accent" @click="save" :disabled="$store.state.soundBlocks.length == 0">Save<md-icon>save_alt</md-icon></md-button>
+    <md-button
+      class="md-raised md-accent"
+      @click="save"
+      :disabled="$store.state.soundBlocks.length == 0"
+    >Save
+      <md-icon>save_alt</md-icon>
+    </md-button>
 
-    <md-dialog :md-active.sync="showDialog" :md-click-outside-to-close="click_outside_to_close" style="padding:10px">
+    <md-dialog
+      :md-active.sync="showDialog"
+      :md-click-outside-to-close="click_outside_to_close"
+      style="padding:10px"
+    >
       <div v-if="!done">
-        <md-dialog-title>処理中です</md-dialog-title>
-        <div class="content">
-          <p>
-            現在書き出し処理中です。  
-          </p>
-        </div>
-        <md-progress-bar md-mode="determinate" :md-value="progress"></md-progress-bar>
+        <md-dialog-title>書き出し処理中です</md-dialog-title>
+        <div class="content"></div>
+        <md-progress-bar :md-mode="progressMode" :md-value="progress"></md-progress-bar>
+
         <md-dialog-actions>
           <md-button class="md-accent" @click="cancel">Cancel</md-button>
         </md-dialog-actions>
@@ -41,7 +47,12 @@
         </md-dialog-actions>
       </div>
     </md-dialog>
-    <md-snackbar md-position="center" md-duration="5000" :md-active.sync="showSnackbar" md-persistent>
+    <md-snackbar
+      md-position="center"
+      md-duration="5000"
+      :md-active.sync="showSnackbar"
+      md-persistent
+    >
       <span>出力が完了しました</span>
       <md-button class="md-primary" @click="showSnackbar = false">OK</md-button>
     </md-snackbar>
@@ -50,11 +61,11 @@
 
 <script>
 import saveAs from "file-saver";
-import Share from '~/components/Share.vue'
+import Share from "~/components/Share.vue";
 
 export default {
   name: "Save",
-  components:{
+  components: {
     Share
   },
   data: function() {
@@ -62,8 +73,9 @@ export default {
       showDialog: false,
       click_outside_to_close: false,
       showSnackbar: false,
-      done : false,
+      done: false,
       progress: 0,
+      progressMode: "indeterminate",
       bitrate: "192",
       saveFileName: "save",
       worker: null
@@ -84,6 +96,7 @@ export default {
           this.done = true;
           this.showSnackbar = true;
         } else {
+          this.progressMode = "determinate";
           this.progress = (index / this.$store.state.soundBlocks.length) * 100;
           if (index == this.$store.state.soundBlocks.length) {
             this.worker.postMessage(["done"]);
@@ -109,10 +122,17 @@ export default {
           ]);
         }
       };
+      let totalSec = 0;
+      this.$store.state.soundBlocks.forEach(
+        el => totalSec += el.endPos - el.startPos
+      );
+
+      this.progressMode = "indeterminate";
       this.worker.postMessage([
         "config",
         this.$store.state.files[0].buffer.sampleRate,
-        Number(this.bitrate)
+        Number(this.bitrate),
+        totalSec
       ]);
     },
     cancel: function() {
