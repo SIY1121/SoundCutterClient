@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <iframe style="height:315px" width="560" height="315" src="https://www.youtube.com/embed/FlBU4IX2-_o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <h1>MusicCutterとは？</h1>
     <p>
       Webブラウザ上で動作する音楽編集アプリです。PC、スマートフォンで利用できます。<br>
@@ -26,14 +27,14 @@
     <h1>フィードバック</h1>
     <p>
       このアプリは現在ベータ版です。<br>
-      このアプリの改善に協力していただける方は<a href="https://twitter.com/SIY1121">@SIY1121</a>に連絡していただくか<br>
+      このアプリのご意見、感想は<a href="https://twitter.com/SIY1121">@SIY1121</a>に連絡していただくか<br>
       <a href="https://docs.google.com/forms/d/1CZxoiZkuRevVNAVaJtNkZksNblSWQ_39HFmRBlQyMS4">こちらのフォーム</a>より、ご連絡ください。
     </p>
     <h1>その他</h1>
     <p>
       このアプリは、Nuxt.jsとWeb Audio APIで作成されています。<br>
-      今年のアドベントカレンダーでこのアプリについて書く予定です。<br>
-      <a href="https://qiita.com/siy1121">siy1121 - qiita</a>
+      今年のアドベントカレンダーで記事を書きました<br>
+      <a href="https://qiita.com/siy1121/items/4496721dae7fde1e0261">ブラウザ上で音楽編集ができるソフトをNuxt.js+WebAudioAPIで作った話</a>
     </p>
   </div>
 </template>

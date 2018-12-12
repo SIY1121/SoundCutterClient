@@ -78,23 +78,26 @@ export default {
       progressMode: "indeterminate",
       bitrate: "192",
       saveFileName: "save",
-      worker: null
+      worker: null,
+      time : null
     };
   },
   methods: {
     save: function() {
       this.$ga.event("Save", "Save", this.bitrate);
+      this.time = Date.now();
       this.done = false;
       this.showDialog = true;
       this.worker = new window.Worker("/worker.js");
       let index = 0;
       this.worker.onmessage = e => {
         if (e.data[0] == "done") {
-          saveAs(e.data[1], "save.mp3");
+          saveAs(e.data[1], this.saveFileName);
           this.worker.terminate();
           this.showDialog = false;
           this.done = true;
           this.showSnackbar = true;
+          this.$ga.event("Save", "Done", Date.now() - this.time);
         } else {
           this.progressMode = "determinate";
           this.progress = (index / this.$store.state.soundBlocks.length) * 100;
@@ -139,6 +142,7 @@ export default {
       this.worker.postMessage(["cancel"]);
       this.worker.terminate();
       this.showDialog = false;
+      this.$ga.event("Save", "Cancel");
     }
   }
 };

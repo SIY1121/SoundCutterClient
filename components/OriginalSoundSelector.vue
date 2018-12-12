@@ -62,7 +62,7 @@
 
           <md-button class="md-icon-button md-raised md-accent" @click="flag">
             <md-icon>flag</md-icon>
-            <md-tooltip md-direction="top">フラグを立てる(ctrl+↑)</md-tooltip>
+            <md-tooltip md-direction="top">マーカー設置(ctrl+↑)</md-tooltip>
           </md-button>
         </div>
         
